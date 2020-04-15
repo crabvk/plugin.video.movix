@@ -1,0 +1,22 @@
+[tool.poetry]
+name = 'plugin.video.movix'
+version = '0.1.0'
+description = 'Dom.ru Movix for kodi'
+license = 'MIT'
+authors = [
+    'Vyacheslav Konovalov <vyachkonovalov@protonmail.com>'
+]
+readme = 'README.md'
+repository = 'https://github.com/vyachkonovalov/plugin.video.movix'
+homepage = 'https://github.com/vyachkonovalov/plugin.video.movix'
+keywords = ['domrutv', 'movix', 'kodi-plugin']
+
+[tool.poetry.dependencies]
+python = '~2.7'
+future = '0.17.1'
+requests = '2.22.0'
+Kodistubs = "^18.0.0"
+
+[tool.poetry.dev-dependencies]
+autoflake = "^1.3.1"
+polib = "^1.1.0"

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.movix" name="Dom.ru Movix" version="0.1.0" provider-name="vyachkonovalov">
+    <requires>
+        <import addon="xbmc.python" version="2.26.0"/>
+        <import addon="script.module.future" version="0.17.1"/>
+        <import addon="script.module.requests" version="2.22.0"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Dom.ru Movix Online Theater</summary>
+        <summary lang="ru_RU">Онлайн-кинотеатр Дом.ru Movix</summary>
+		<description lang="en_GB">Over 200 live channels. Watch the latest series on the day of release, as well as new movies. Over 300 films. Legally, in excellent quality.</description>
+		<description lang="ru_RU">Более 200 каналов в прямом эфире. Смотрите свежие сериалы в день выхода, а также новинки кино. Более 300 фильмов. Легально, в отличном качестве.</description>
+        <language>ru</language>
+        <platform>all</platform>
+        <license>MIT</license>
+        <!-- <forum></forum> -->
+        <website>https://movix.ru/</website>
+        <email>vyachkonovalov@protonmail.com</email>
+        <!-- <source></source> -->
+        <!-- <news></news> -->
+        <assets>
+            <icon>resources/icon.png</icon>
+            <fanart>resources/fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>

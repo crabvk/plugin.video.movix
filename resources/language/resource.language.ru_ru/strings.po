@@ -1,0 +1,115 @@
+#
+msgid ""
+msgstr ""
+
+msgctxt "#30000"
+msgid "Cancel"
+msgstr "Отмена"
+
+msgctxt "#30001"
+msgid "Try again"
+msgstr "Повторить"
+
+msgctxt "#30002"
+msgid "Internet connection error"
+msgstr "Ошибка подключения к интернету"
+
+msgctxt "#30003"
+msgid "Request timed out while trying to connect to the server"
+msgstr "Тайм-аут запроса при попытке подключения к серверу"
+
+msgctxt "#30004"
+msgid "Data request error"
+msgstr "Ошибка при запросе данных"
+
+msgctxt "#30005"
+msgid "Unknown reason"
+msgstr "Причина неизвестна"
+
+msgctxt "#30006"
+msgid "The server did not send any data in the allotted amount of time"
+msgstr "Сервер не отправил данные за отведенное время"
+
+msgctxt "#30007"
+msgid "Unable to connect to the server"
+msgstr "Невозможно подключиться к серверу"
+
+msgctxt "#30008"
+msgid "Loading"
+msgstr "Загрузка"
+
+msgctxt "#30009"
+msgid "Select your city"
+msgstr "Выберите свой город"
+
+msgctxt "#30010"
+msgid "Password"
+msgstr "Пароль"
+
+msgctxt "#30011"
+msgid "Contract number, email or phone"
+msgstr "Номер договора, email или телефон"
+
+msgctxt "#30012"
+msgid "Next page (%i of %i)"
+msgstr "Следующая страница (%i из %i)"
+
+msgctxt "#30013"
+msgid "Public packages"
+msgstr "Публичные каналы"
+
+msgctxt "#30014"
+msgid "Sign in"
+msgstr "Вход"
+
+msgctxt "#30015"
+msgid "Authentication"
+msgstr "Аутентификация"
+
+msgctxt "#30016"
+msgid "Binding device"
+msgstr "Привязка устройства"
+
+msgctxt "#30017"
+msgid "Device registration"
+msgstr "Регистрация устройства"
+
+msgctxt "#30018"
+msgid "Package channels"
+msgstr "Каналы пакета"
+
+msgctxt "#30019"
+msgid "List of regions"
+msgstr "Список регионов"
+
+msgctxt "#30020"
+msgid "Device status"
+msgstr "Статус устройства"
+
+msgctxt "#30021"
+msgid "Channel packages"
+msgstr "Пакеты каналов"
+
+msgctxt "#30022"
+msgid "Channels"
+msgstr "Каналы"
+
+msgctxt "#30023"
+msgid "Episodes"
+msgstr "Серии"
+
+msgctxt "#30024"
+msgid "Movies"
+msgstr "Фильмы"
+
+msgctxt "#30025"
+msgid "Seasons"
+msgstr "Сезоны"
+
+msgctxt "#30026"
+msgid "Serials"
+msgstr "Сериалы"
+
+msgctxt "#30027"
+msgid "TV channels"
+msgstr "ТВ каналы"
