@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.movix" name="Dom.ru Movix" version="0.1.0" provider-name="vyachkonovalov">
+<addon id="plugin.video.movix" name="Dom.ru Movix" version="0.2.0" provider-name="vyachkonovalov">
     <requires>
         <import addon="xbmc.python" version="2.26.0"/>
         <import addon="script.module.future" version="0.17.1"/>
@@ -19,8 +19,7 @@
         <!-- <forum></forum> -->
         <website>https://movix.ru/</website>
         <email>vyachkonovalov@protonmail.com</email>
-        <!-- <source></source> -->
-        <!-- <news></news> -->
+        <source>https://github.com/vyachkonovalov/plugin.video.movix</source>
         <assets>
             <icon>resources/icon.png</icon>
             <fanart>resources/fanart.jpg</fanart>

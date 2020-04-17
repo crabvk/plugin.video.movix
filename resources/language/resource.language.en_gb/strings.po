@@ -51,73 +51,81 @@ msgid "Contract number, email or phone"
 msgstr ""
 
 msgctxt "#30012"
-msgid "Next page (%i of %i)"
+msgid "Next page"
 msgstr ""
 
 msgctxt "#30013"
-msgid "Public packages"
+msgid "Next page (%i of %i)"
 msgstr ""
 
 msgctxt "#30014"
-msgid "Sign in"
+msgid "Public packages"
 msgstr ""
 
 msgctxt "#30015"
-msgid "Authentication"
+msgid "Sign in"
 msgstr ""
 
 msgctxt "#30016"
-msgid "Binding device"
+msgid "Authentication"
 msgstr ""
 
 msgctxt "#30017"
-msgid "Device registration"
+msgid "Binding device"
 msgstr ""
 
 msgctxt "#30018"
-msgid "Package channels"
+msgid "Device registration"
 msgstr ""
 
 msgctxt "#30019"
-msgid "List of regions"
+msgid "Package channels"
 msgstr ""
 
 msgctxt "#30020"
-msgid "Device status"
+msgid "List of regions"
 msgstr ""
 
 msgctxt "#30021"
-msgid "General"
+msgid "Device status"
 msgstr ""
 
 msgctxt "#30022"
-msgid "Items per page"
+msgid "General"
 msgstr ""
 
 msgctxt "#30023"
-msgid "Channel packages"
+msgid "Channels pagination"
 msgstr ""
 
 msgctxt "#30024"
-msgid "Channels"
+msgid "Items per page"
 msgstr ""
 
 msgctxt "#30025"
-msgid "Episodes"
+msgid "Channel packages"
 msgstr ""
 
 msgctxt "#30026"
-msgid "Movies"
+msgid "Channels"
 msgstr ""
 
 msgctxt "#30027"
-msgid "Seasons"
+msgid "Episodes"
 msgstr ""
 
 msgctxt "#30028"
-msgid "Serials"
+msgid "Movies"
 msgstr ""
 
 msgctxt "#30029"
+msgid "Seasons"
+msgstr ""
+
+msgctxt "#30030"
+msgid "Serials"
+msgstr ""
+
+msgctxt "#30031"
 msgid "TV channels"
 msgstr ""
