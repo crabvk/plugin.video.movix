@@ -8,6 +8,8 @@ import polib
 from tempfile import mkstemp
 from collections import OrderedDict
 
+sys.tracebacklimit = 1
+
 # NOTE: en_gb must be first, others not required
 LANGS = ['en_gb', 'ru_ru']
 trans = []
@@ -33,9 +35,8 @@ po_entries = {}
 for lang in LANGS:
     po_entries[lang] = {}
 
-# Find and replace _('key') => _(30000)
-def repl(match):
-    key = match.group(0)[3:-2]
+
+def key_to_id(key):
     pair = en.get(key)
     if not pair:
         raise Exception("No translation entry for key '%s' in en_gb.py" % key)
@@ -55,19 +56,36 @@ def repl(match):
             msgid=msgid,
             msgstr=msgstr.decode('utf-8')
         )
-    return '_(%i)' % num
+    return num
 
 
-for source in pyfiles:
-    fin = open(source, 'r')
+def repl_py(match):
+    key = match.group(0)[3:-2]
+    return '_(%i)' % key_to_id(key)
+
+
+def repl_settings(match):
+    key = match.group(0)[8:-1]
+    return ' label="%i"' % key_to_id(key)
+
+
+def patch_file(path, regex, repl):
+    fin = open(path, 'r')
     dest = mkstemp()[1]
     fout = open(dest, 'w')
     for line in fin:
-        out = re.sub(r'_\((?:\'|").*(?:\'|")\)', repl, line)
+        out = re.sub(regex, repl, line)
         fout.write(out)
     fin.close()
     fout.close()
-    shutil.move(dest, source)
+    shutil.move(dest, path)
+
+
+for path in pyfiles:
+    patch_file(path, r'_\((?:\'|").+(?:\'|")\)', repl_py)
+
+settings_path = os.path.join(DIR, 'resources/settings.xml')
+patch_file(settings_path, r'\slabel="(.+?)"', repl_settings)
 
 # Save strings.so for each language
 for lang in LANGS:

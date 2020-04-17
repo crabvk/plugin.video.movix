@@ -99,7 +99,23 @@ def bind_device(token):
 
 @cache(CACHE_MAX_AGE)
 @show_progress(_('text.channels'))
-def channels(token, public=False):
+def channels(token, limit, page):
+    url = STB_HOST + '/api/v3/showcases/library/channels'
+    params = {'limit': str(limit), 'page': str(page)}
+    resp = _request('get', url, params=params, headers=_headers(token))
+    if not resp.has_key('data'):
+        return Resp(0, resp.get('error'))
+
+    chs, _ = _map_items(resp['data']['items'], ['id', 'title', 'description', 'lcn'], {
+        'hls_id': 'hls',
+        'poster_id': 'poster_channel_grid_blueprint'
+    })
+    return Resp(1, chs, {'pages': _pages(resp, limit)})
+
+
+@cache(CACHE_MAX_AGE)
+@show_progress(_('text.channels'))
+def channels_all(token, public=False):
     url = ANDROID_HOST + '/channel_list/multiscreen'
     resp = _request('get', url, headers=_headers(token))
     if not resp.get('result'):
@@ -137,19 +153,19 @@ def art_url(art_id, w=0, h=0):
 
 @cache(CACHE_MAX_AGE)
 @show_progress(_('text.channel_packages'))
-def channel_packages(token, page=1):
+def channel_packages(token, limit, page):
     url = STB_HOST + '/api/v3/showcases/library/channel-packages'
-    params = {'limit': '100', 'page': str(page)}
+    params = {'limit': str(limit), 'page': str(page)}
     resp = _request('get', url, params=params, headers=_headers(token))
     if not resp.has_key('data'):
         return Resp(0, resp.get('error'))
 
-    pkgs = _map_items(resp['data']['items'],
-                      ['id', 'title', 'description', (lambda i: i['adult']['type'], 'adult')], {
+    pkgs, _ = _map_items(resp['data']['items'],
+                         ['id', 'title', 'description', (lambda i: i['adult']['type'], 'adult')], {
         'poster_id': '3_smarttv_package_poster_video_library_blueprint',
         'fanart_id': '3_smarttv_asset_background_banner_fullscreen_blueprint'
     })
-    return Resp(1, pkgs)
+    return Resp(1, pkgs, {'pages': _pages(resp, limit)})
 
 
 @cache(CACHE_MAX_AGE)
@@ -161,7 +177,7 @@ def package_channels(token, id, adult=0):
     if not resp.has_key('data'):
         return Resp(0, resp.get('error'))
 
-    chs = _map_items(resp['data']['items'], ['id', 'title', 'description', 'lcn'], {
+    chs, _ = _map_items(resp['data']['items'], ['id', 'title', 'description', 'lcn'], {
         'hls_id': 'hls',
         'poster_id': 'poster_channel_grid_blueprint'
     })
@@ -170,38 +186,36 @@ def package_channels(token, id, adult=0):
 
 @cache(CACHE_MAX_AGE)
 @show_progress(_('text.movies'))
-def movies(token, page=1):
-    params = {'limit': '100', 'page': str(page)}
+def movies(token, limit, offset):
     url = STB_HOST + '/api/v3/showcases/library/movies'
+    params = {'limit': '100', 'offset': str(offset)}
     resp = _request('get', url, params=params, headers=_headers(token))
     if not resp.has_key('data'):
         return Resp(0, resp.get('error'))
 
-    movs = _map_items(resp['data']['items'], ['id', 'title', 'description'], {
+    movs, offset = _map_items(resp['data']['items'], ['id', 'title', 'description'], {
         'hls_id': 'hls',
         'poster_id': 'poster_blueprint',
         'fanart_id': '3_smarttv_asset_background_video_library_blueprint'
-    })
-    pages = int(math.ceil(resp['data']['total'] / 100.0))
-    return Resp(1, movs, {'pages': pages})
+    }, limit, offset)
+    return Resp(1, movs, {'offset': offset, 'total': resp['data']['total']})
 
 
 @cache(CACHE_MAX_AGE)
 @show_progress(_('text.serials'))
-def serials(token, page=1):
-    params = {'limit': '100', 'page': str(page)}
+def serials(token, limit, page):
+    params = {'limit': str(limit), 'page': str(page)}
     url = STB_HOST + '/api/v3/showcases/library/serials'
     resp = _request('get', url, params=params, headers=_headers(token))
     if not resp.has_key('data'):
         return Resp(0, resp.get('error'))
 
-    srls = _map_items(resp['data']['items'], ['id', 'title', 'description'], {
+    srls, _ = _map_items(resp['data']['items'], ['id', 'title', 'description'], {
         'hls_id': 'hls',
         'poster_id': 'poster_blueprint',
         'fanart_id': '3_smarttv_serial_background_video_library_blueprint'
     })
-    pages = int(math.ceil(resp['data']['total'] / 100.0))
-    return Resp(1, srls, {'pages': pages})
+    return Resp(1, srls, {'pages': _pages(resp, limit)})
 
 
 @cache(CACHE_MAX_AGE)
@@ -212,7 +226,7 @@ def seasons(token, serial_id):
     if not resp.has_key('data'):
         return Resp(0, resp.get('error'))
 
-    sns = _map_items(resp['data']['items'], ['id', 'title', 'description', 'number'], {
+    sns, _ = _map_items(resp['data']['items'], ['id', 'title', 'description', 'number'], {
         'poster_id': 'poster_blueprint',
         'fanart_id': '3_smarttv_season_background_video_library_blueprint'
     })
@@ -227,7 +241,7 @@ def episodes(token, season_id):
     if not resp.has_key('data'):
         return Resp(0, resp.get('error'))
 
-    epds = _map_items(resp['data']['items'], ['id', 'title', 'description', 'number'], {
+    epds, _ = _map_items(resp['data']['items'], ['id', 'title', 'description', 'number'], {
         'hls_id': 'hls',
         'poster_id': [
             '3_smarttv_episode_poster_video_library_blueprint',
@@ -238,9 +252,10 @@ def episodes(token, season_id):
     return Resp(1, epds)
 
 
-def _map_items(items, keys, res_map):
+def _map_items(items, keys, res_map, limit=100, offset=0):
     mapped = []
     for item in items:
+        offset += 1
         if item['available']['type'] == 'not-available':
             continue
         mi = utils.subset(item, *keys)
@@ -253,7 +268,9 @@ def _map_items(items, keys, res_map):
                 res[data_key] = next((resources[t]['id'] for t in res_type if resources.get(t)), None)
         mi.update(res)
         mapped.append(mi)
-    return mapped
+        if len(mapped) == limit:
+            break
+    return [mapped, offset]
 
 
 def _request(method, url, **kwargs):
@@ -269,6 +286,10 @@ def _request(method, url, **kwargs):
         msg = _('error.read_timeout')
     except RequestException:
         msg = _('error.request_exception')
-    if resp:
-        return resp.json()
-    return {'error': {'message': msg}}
+    if resp == None:
+        return {'error': {'message': msg}}
+    return resp.json()
+
+
+def _pages(resp, limit):
+    return int(math.ceil(resp['data']['total'] / float(limit)))

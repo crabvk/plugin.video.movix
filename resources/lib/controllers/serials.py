@@ -10,9 +10,10 @@ from resources.lib.translation import _
 
 def index(router, params):
     handle = router.session.handle
+    limit = utils.addon.getSettingInt('page_limit')
     page = params.get('page', 1)
 
-    resp = api.serials(router.session.token['token'], page)
+    resp = api.serials(router.session.token['token'], limit, page)
     if not resp.ok:
         if utils.show_error(resp.data, ask=_('button.try_again')):
             return index(router, params)
@@ -28,12 +29,12 @@ def index(router, params):
             title=srl['title'],
             plot=srl['description']
         ))
-        url = router.serials_url('seasons', id=srl['id'], page=page)
+        url = router.serials_url('seasons', id=srl['id'], serials_page=page)
         serials.append((url, li, True))
 
     # Next page
     if page < resp.meta['pages']:
-        label = _('li.next_page') % (page + 1, resp.meta['pages'])
+        label = _('li.next_page_number') % (page + 1, resp.meta['pages'])
         li = xbmcgui.ListItem(label=label)
         url = router.serials_url('index', page=page + 1)
         serials.append((url, li, True))
@@ -50,7 +51,7 @@ def seasons(router, params):
     if not resp.ok:
         if utils.show_error(resp.data, ask=_('button.try_again')):
             return seasons(router, params)
-        return router.redirect('serials', 'index', page=params['page'])
+        return router.redirect('serials', 'index', page=params['serials_page'])
 
     items = []
     for sn in resp.data:

@@ -19,6 +19,7 @@ def index(router, _params=None):
         utils.write_file('token.json', json.dumps(token, separators=(',', ':')))
 
     items = []
+
     def add_channels_item(label):
         li = xbmcgui.ListItem(label=label)
         li.setInfo('video', dict(plot=_('text.tv_channels')))
@@ -123,3 +124,5 @@ def play(router, params):
     url = resp.data if resp.ok else None
     li = xbmcgui.ListItem(path=url)
     xbmcplugin.setResolvedUrl(router.session.handle, bool(resp.ok), li)
+    if not resp.ok:
+        utils.show_error(resp.data)

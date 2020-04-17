@@ -8,13 +8,15 @@ import resources.lib.utils as utils
 from resources.lib.translation import _
 
 
-def index(router, _params=None):
+def index(router, params):
     handle = router.session.handle
+    limit = utils.addon.getSettingInt('page_limit')
+    page = params.get('page', 1)
 
-    resp = api.channel_packages(router.session.token['token'])
+    resp = api.channel_packages(router.session.token['token'], limit, page)
     if not resp.ok:
         if utils.show_error(resp.data, ask=_('button.try_again')):
-            return index(router)
+            return index(router, params)
         return router.redirect('root', 'index')
 
     packages = []
@@ -26,7 +28,14 @@ def index(router, _params=None):
         ))
         li.setInfo('video', dict(title=pkg['title'], plot=pkg['description']))
         adult = {'adult': 1} if pkg['adult'] == 'adult' else {}
-        url = router.channel_packages_url('channels', id=pkg['id'], **adult)
+        url = router.channel_packages_url('channels', id=pkg['id'], packages_page=page, **adult)
+        packages.append((url, li, True))
+
+    # Next page
+    if page < resp.meta['pages']:
+        url = router.channel_packages_url('index', page=page + 1)
+        label = _('li.next_page_number') % (page + 1, resp.meta['pages'])
+        li = xbmcgui.ListItem(label=label)
         packages.append((url, li, True))
 
     xbmcplugin.addDirectoryItems(handle, packages, len(packages))
@@ -39,10 +48,10 @@ def channels(router, params):
     resp = api.package_channels(router.session.token['token'], params['id'], params.get('adult'))
     if not resp.ok:
         if utils.show_error(resp.data, ask=_('button.try_again')):
-            return show(router, params)
-        return router.redirect('channel_packages', 'index')
+            return channels(router, params)
+        return router.redirect('channel_packages', 'index', page=params.get('packages_page'))
 
-    channels = []
+    items = []
     for ch in resp.data:
         li = xbmcgui.ListItem(label=ch['title'], label2=ch['description'])
         li.setArt({'poster': api.art_url(ch['poster_id'])})
@@ -53,9 +62,9 @@ def channels(router, params):
         ))
         li.setProperty('IsPlayable', 'true')
         url = router.root_url('play', id=ch['id'], hls_id=ch['hls_id'])
-        channels.append((url, li, False))
+        items.append((url, li, False))
 
-    xbmcplugin.addDirectoryItems(handle, channels, len(channels))
+    xbmcplugin.addDirectoryItems(handle, items, len(items))
     xbmcplugin.endOfDirectory(handle)
     xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_TRACKNUM)
     xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_TITLE)

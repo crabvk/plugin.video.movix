@@ -10,8 +10,6 @@ import xbmcgui
 from functools import wraps
 from resources.lib.translation import _
 
-# TODO: clear old cache on plugin start
-
 addon = xbmcaddon.Addon()
 PLUGIN_VERSION = addon.getAddonInfo('version')
 LANG = xbmc.getLanguage(xbmc.ISO_639_1)
@@ -79,18 +77,13 @@ def write_file(path, string):
     file.close()
 
 
-_token = None
 def read_token():
-    global _token
-    if _token:
-        return _token
     filepath = os.path.join(STORAGE_PATH, 'token.json')
     if xbmcvfs.exists(filepath):
         file = xbmcvfs.File(filepath)
         token = json.loads(file.read())
         file.close()
         if token['expires'] > time.time():
-            _token = token
             return token
         # TODO: request new token
         # ? need an expired token in Movix Android app to sniff how to request a new token

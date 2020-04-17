@@ -10,12 +10,13 @@ from resources.lib.translation import _
 
 def index(router, params):
     handle = router.session.handle
-    page = params.get('page', 1)
+    limit = utils.addon.getSettingInt('page_limit')
+    offset = params.get('offset', 0)
 
-    resp = api.movies(router.session.token['token'], page)
+    resp = api.movies(router.session.token['token'], limit, offset)
     if not resp.ok:
         if utils.show_error(resp.data, ask=_('button.try_again')):
-            return index(router)
+            return index(router, params)
         return router.redirect('root', 'index')
 
     movies = []
@@ -33,10 +34,9 @@ def index(router, params):
         movies.append((url, li, False))
 
     # Next page
-    if page < resp.meta['pages']:
-        label = 'Next page (%i of %i)' % (page + 1, resp.meta['pages'])
-        li = xbmcgui.ListItem(label=label)
-        url = router.movies_url('index', page=page + 1)
+    if resp.meta['offset'] < resp.meta['total']:
+        li = xbmcgui.ListItem(label=_('li.next_page'))
+        url = router.movies_url('index', offset=resp.meta['offset'])
         movies.append((url, li, True))
 
     xbmcplugin.addDirectoryItems(handle, movies, len(movies))

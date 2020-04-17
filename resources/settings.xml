@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="settings.general">
+        <setting label="settings.page_limit" type="slider" id="page_limit" default="100" range="10,5,100" option="int" />
+        <setting label="settings.channels_pagination" type="bool" id="channels_pagination" default="false" />
+    </category>
+</settings>

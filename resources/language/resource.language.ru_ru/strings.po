@@ -87,29 +87,37 @@ msgid "Device status"
 msgstr "Статус устройства"
 
 msgctxt "#30021"
+msgid "General"
+msgstr "Общие"
+
+msgctxt "#30022"
+msgid "Items per page"
+msgstr "Элементов на странице"
+
+msgctxt "#30023"
 msgid "Channel packages"
 msgstr "Пакеты каналов"
 
-msgctxt "#30022"
+msgctxt "#30024"
 msgid "Channels"
 msgstr "Каналы"
 
-msgctxt "#30023"
+msgctxt "#30025"
 msgid "Episodes"
 msgstr "Серии"
 
-msgctxt "#30024"
+msgctxt "#30026"
 msgid "Movies"
 msgstr "Фильмы"
 
-msgctxt "#30025"
+msgctxt "#30027"
 msgid "Seasons"
 msgstr "Сезоны"
 
-msgctxt "#30026"
+msgctxt "#30028"
 msgid "Serials"
 msgstr "Сериалы"
 
-msgctxt "#30027"
+msgctxt "#30029"
 msgid "TV channels"
 msgstr "ТВ каналы"
