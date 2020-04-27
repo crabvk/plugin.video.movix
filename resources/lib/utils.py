@@ -28,6 +28,10 @@ class Resp():
     def __str__(self):
         return json.dumps({'data': self.data, 'meta': self.meta}, separators=(',', ':'))
 
+    @property
+    def data_str(self):
+        return json.dumps(self.data, separators=(',', ':'))
+
     @staticmethod
     def from_string(string):
         resp = json.loads(string)

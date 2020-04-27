@@ -6,7 +6,7 @@ Unofficial Kodi plugin for [Dom.ru Movix Online Theater](https://movix.ru/).
 
 ## Features
 
-* Sign in
+* Sign in (with password or SMS)
 * Watch live channels
 * Browse channel packages
 * Watch movies and serials
@@ -24,6 +24,23 @@ However, anything already bought should be accessible.
 1. Download latest `plugin.video.movix-x.y.z.zip` from
 [releases](https://github.com/vyachkonovalov/plugin.video.movix/releases)
 2. Open Kodi: Add-ons ⇒ Install from zip file
+
+## How to
+
+### Use single device slot for multiple plugin installs
+
+[Not ready yet](https://github.com/vyachkonovalov/plugin.video.movix/projects/1#card-36378995)
+
+### Sign out
+
+Do one of the following:
+
+* `rm -rf ~/.kodi/userdata/addon_data/plugin.video.movix/*` and restart Kodi.
+* Uninstall add-on: choose 'Yes' when Kodi asks to remove all related data.
+
+You may also want to remove the plugin from connected devices. Use
+[Movix Android app](https://play.google.com/store/apps/details?id=com.ertelecom.domrutv)
+or [movix.ru](https://movix.ru/profile/connected-devices).
 
 ## Terminology
 

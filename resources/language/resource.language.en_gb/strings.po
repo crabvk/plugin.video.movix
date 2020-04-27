@@ -19,113 +19,137 @@ msgid "Request timed out while trying to connect to the server"
 msgstr ""
 
 msgctxt "#30004"
-msgid "Data request error"
+msgid "Contract number not found by phone number %s"
 msgstr ""
 
 msgctxt "#30005"
-msgid "Unknown reason"
+msgid "Data request error"
 msgstr ""
 
 msgctxt "#30006"
-msgid "The server did not send any data in the allotted amount of time"
+msgid "Unknown reason"
 msgstr ""
 
 msgctxt "#30007"
-msgid "Unable to connect to the server"
+msgid "The server did not send any data in the allotted amount of time"
 msgstr ""
 
 msgctxt "#30008"
-msgid "Loading"
+msgid "Unable to connect to the server"
 msgstr ""
 
 msgctxt "#30009"
-msgid "Select your city"
+msgid "Loading"
 msgstr ""
 
 msgctxt "#30010"
-msgid "Password"
+msgid "Select your city"
 msgstr ""
 
 msgctxt "#30011"
-msgid "Contract number, email or phone"
+msgid "Password"
 msgstr ""
 
 msgctxt "#30012"
-msgid "Next page"
+msgid "Phone number"
 msgstr ""
 
 msgctxt "#30013"
-msgid "Next page (%i of %i)"
+msgid "Sign in by SMS"
 msgstr ""
 
 msgctxt "#30014"
-msgid "Public packages"
+msgid "SMS code"
 msgstr ""
 
 msgctxt "#30015"
-msgid "Sign in"
+msgid "Contract number, email or phone"
 msgstr ""
 
 msgctxt "#30016"
-msgid "Authentication"
+msgid "Next page"
 msgstr ""
 
 msgctxt "#30017"
-msgid "Binding device"
+msgid "Next page (%i of %i)"
 msgstr ""
 
 msgctxt "#30018"
-msgid "Device registration"
+msgid "Public packages"
 msgstr ""
 
 msgctxt "#30019"
-msgid "Package channels"
+msgid "Sign in"
 msgstr ""
 
 msgctxt "#30020"
-msgid "List of regions"
+msgid "Authentication"
 msgstr ""
 
 msgctxt "#30021"
-msgid "Device status"
+msgid "Binding device"
 msgstr ""
 
 msgctxt "#30022"
-msgid "General"
+msgid "Device registration"
 msgstr ""
 
 msgctxt "#30023"
-msgid "Channels pagination"
+msgid "Package channels"
 msgstr ""
 
 msgctxt "#30024"
-msgid "Items per page"
+msgid "List of regions"
 msgstr ""
 
 msgctxt "#30025"
-msgid "Channel packages"
+msgid "Checking SMS code"
 msgstr ""
 
 msgctxt "#30026"
-msgid "Channels"
+msgid "Requesting SMS"
 msgstr ""
 
 msgctxt "#30027"
-msgid "Episodes"
+msgid "Device status"
 msgstr ""
 
 msgctxt "#30028"
-msgid "Movies"
+msgid "Channels pagination"
 msgstr ""
 
 msgctxt "#30029"
-msgid "Seasons"
+msgid "General"
 msgstr ""
 
 msgctxt "#30030"
-msgid "Serials"
+msgid "Items per page"
 msgstr ""
 
 msgctxt "#30031"
+msgid "Channel packages"
+msgstr ""
+
+msgctxt "#30032"
+msgid "Channels"
+msgstr ""
+
+msgctxt "#30033"
+msgid "Episodes"
+msgstr ""
+
+msgctxt "#30034"
+msgid "Movies"
+msgstr ""
+
+msgctxt "#30035"
+msgid "Seasons"
+msgstr ""
+
+msgctxt "#30036"
+msgid "Serials"
+msgstr ""
+
+msgctxt "#30037"
 msgid "TV channels"
 msgstr ""

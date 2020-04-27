@@ -15,6 +15,7 @@ from resources.lib.controllers import (
 router = Router('plugin://plugin.video.movix')
 router.add('/', root, 'index')
 router.add('/sign_in', root, 'sign_in')
+router.add('/sign_in_sms', root, 'sign_in_sms')
 router.add('/play/{id}/{hls_id}', root, 'play', id=int, hls_id=int)
 router.add('/channels', channels, 'index', page=int)
 router.add('/channel-packages', channel_packages, 'index', page=int)

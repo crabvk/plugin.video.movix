@@ -19,7 +19,7 @@ DEVICE_ID = hashlib.sha1(str(uuid.getnode())).hexdigest()[-16:]
 HEADERS = {
     'X-Device-Info': DEVICE_ID,
     'View': 'stb3',
-    'X-App-Version': '3.9.2',
+    'X-App-Version': '3.9.3',
     'User-Agent': xbmc.getUserAgent()
 }
 
@@ -77,6 +77,45 @@ def auth(token, username, password, region):
     resp = _request('get', url, params=params, headers=_headers(token))
     if not resp.get('result'):
         return Resp(0, resp.get('error'))
+    return Resp(1, utils.subset(resp, 'is_bound', 'token', 'expires'))
+
+
+@show_progress(_('progress.sms_request'))
+def sms_auth(token, phone):
+    url = ANDROID_HOST + '/er/ott/get_agreements_by_phone'
+    params = {'phone_number': phone}
+    resp = _request('get', url, params=params, headers=_headers(token))
+    if not resp.get('result'):
+        return Resp(0, resp.get('error'))
+    if not resp['principals']:
+        return Resp(0, {'message': _('error.contract_not_found') % phone})
+
+    url = ANDROID_HOST + '/er/sms/auth'
+    region = resp['principals'][0]['domain']
+    data = {'phone': phone, 'region': region}
+    resp = _request('post', url, headers=_headers(token), data=data)
+    if not resp.get('result'):
+        return Resp(0, resp.get('error'))
+
+    result = utils.subset(
+        resp['agreements'],
+        'send_sms',
+        ('sms_error_text', 'message'),
+        (lambda d: d['agreement'][0]['agr_id'], 'agr_id')
+    )
+    result['region'] = region
+    return Resp(1, result)
+
+
+@show_progress(_('progress.sms_check'))
+def sms_check(token, phone, region, agr_id, sms_code):
+    url = ANDROID_HOST + '/er/sms/check'
+    data = {'phone': phone, 'region': region, 'agr_id': str(agr_id), 'sms_code': str(sms_code)}
+    resp = _request('post', url, headers=_headers(token), data=data)
+    if not resp.get('result'):
+        return Resp(0, resp.get('error'))
+    if not resp.get('token'):
+        return Resp(0, {'message': resp['Agreements']['sms_error_text']})
     return Resp(1, utils.subset(resp, 'is_bound', 'token', 'expires'))
 
 

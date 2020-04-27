@@ -15,8 +15,8 @@ def index(router, _params=None):
         if not resp.ok:
             utils.show_error(resp.data)
             return xbmcplugin.endOfDirectory(handle)
+        utils.write_file('token.json', resp.data_str)
         token = resp.data
-        utils.write_file('token.json', json.dumps(token, separators=(',', ':')))
 
     items = []
 
@@ -68,6 +68,11 @@ def index(router, _params=None):
         li = xbmcgui.ListItem(label=_('li.sign_in'))
         items.append((url, li, True))
 
+        # Sign in by SMS
+        url = router.root_url('sign_in_sms')
+        li = xbmcgui.ListItem(label=_('label.sign_in_sms'))
+        items.append((url, li, True))
+
         # Channels
         add_channels_item(_('li.public_channels'))
 
@@ -115,7 +120,36 @@ def sign_in(router, params):
         utils.show_error(resp.data)
         return router.redirect('root', 'index')
 
-    utils.write_file('token.json', json.dumps(resp.data, separators=(',', ':')))
+    utils.write_file('token.json', resp.data_str)
+    router.redirect('root', 'index', token=resp.data)
+
+
+def sign_in_sms(router, params):
+    dialog = xbmcgui.Dialog()
+
+    phone = dialog.input(_('label.phone_number'), type=xbmcgui.INPUT_ALPHANUM)
+    if not phone:
+        return router.redirect('root', 'index')
+
+    token = router.session.token
+    resp = api.sms_auth(token['token'], phone)
+    if not resp.ok:
+        utils.show_error(resp.data)
+        return router.redirect('root', 'index')
+
+    if not resp.data['send_sms']:
+        utils.show_error(resp.data)
+
+    code = dialog.input(_('label.sms_code'), type=xbmcgui.INPUT_NUMERIC)
+    if not code:
+        return router.redirect('root', 'index')
+
+    resp = api.sms_check(token['token'], phone, resp.data['region'], resp.data['agr_id'], code)
+    if not resp.ok:
+        utils.show_error(resp.data)
+        return router.redirect('root', 'index')
+
+    utils.write_file('token.json', resp.data_str)
     router.redirect('root', 'index', token=resp.data)
 
 
