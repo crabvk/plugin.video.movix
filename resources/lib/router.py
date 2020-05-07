@@ -18,11 +18,12 @@ class Router:
         self.host = host
         self.routes = {}
 
+    # NOTE: only int and optional str types supported
     def add(self, path, controller, action, **types):
         key = controller.__name__.split('.')[-1] + '#' + action
         self.routes[key] = dict(path=path, controller=controller, action=action, types=types)
 
-    def run(self, url, handle, qs, _):
+    def run(self, url, handle, qs='', _=None):
         utils.log(url + qs)
         url = urlparse(url + qs)
         route = None
@@ -32,7 +33,7 @@ class Router:
             if match:
                 route = r
                 break
-        if not route:
+        if route == None:
             raise ValueError('No matching route found for ' + url.geturl())
 
         types = route['types']
@@ -62,12 +63,12 @@ class Router:
 
     def _path(self, controller_name, action, **params):
         path = self._route(controller_name, action)['path']
-        if params:
-            path_params = re.findall(r'{(\w+)}', path)
+        path_params = re.findall(r'{(\w+)}', path)
+        if path_params:
             try:
                 path = path.format(**params)
             except KeyError, e:
-                raise ValueError('Required parameter \'%s\' is missing for %s' % e.message, path)
+                raise ValueError('Required parameter %s is missing for %s' % (e, path))
             for pp in path_params:
                 params.pop(pp, None)
         if params:
@@ -101,7 +102,7 @@ class Router:
                 try:
                     params[key] = ptype(value)
                 except ValueError:
-                    msg = "Can't cast value '%s' to type %s for parameter %s" % (params[key], ptype.__name__, key)
+                    msg = "Can't cast value <%s> to type %s for parameter %s" % (params[key], ptype.__name__, key)
                     raise TypeError(msg)
         return params
 

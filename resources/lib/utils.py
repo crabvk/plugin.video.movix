@@ -28,6 +28,11 @@ class Resp():
     def __str__(self):
         return json.dumps({'data': self.data, 'meta': self.meta}, separators=(',', ':'))
 
+    def __eq__(self, resp):
+        if not isinstance(resp, Resp):
+            return False
+        return self.ok == resp.ok and self.data == resp.data and self.meta == resp.meta
+
     @property
     def data_str(self):
         return json.dumps(self.data, separators=(',', ':'))
@@ -38,29 +43,9 @@ class Resp():
         return Resp(1, resp['data'], resp['meta'])
 
 
-def find_map(items, queries, mappings):
-    queries = {i: q for i, q in enumerate(queries)}
-    result = {}
-    for item in items:
-        for idx, query in queries.items():
-            # If all query conditions are met for an item
-            if all(i in item.items() for i in query.items()):
-                mapping = mappings[idx] if isinstance(mappings, list) else mappings
-                result[idx] = mapping(item)
-                del queries[idx]
-                break
-        if len(queries) == 0:
-            break
-    for idx in queries:
-        result[idx] = None
-    return [result[key] for key in sorted(result)]
-
-
 def subset(data, *keys):
     """
-    {'a': 1, 'b': 2, 'c': 3}, 'a', 'c'        => {'a': 1, 'c': 3}
-    {'a': 1, 'b': 2, 'c': 3}, 'a', ('c', 'y') => {'a': 1, 'y': 3}
-    {'a': 1, 'b': 2, 'c': 3}, 'a', (lambda d: d['c'], 'y') => {'a': 1, 'y': 3}
+    Gets subset of data with given keys
     """
     result = {}
     for key in keys:
@@ -151,7 +136,7 @@ def show_error(error, ask=None):
     dialog = xbmcgui.Dialog()
     if ask:
         return dialog.yesno(header, message, nolabel=_('button.cancel'), yeslabel=ask)
-    dialog.ok(header, message)
+    return dialog.ok(header, message)
 
 
 def show_progress(message):
@@ -172,5 +157,6 @@ def show_progress(message):
     return decorator
 
 
-def log(message):
-    xbmc.log('===> ' + str(message), xbmc.LOGNOTICE)
+def log(*args):
+    msg = reduce(lambda a, b: str(a) + ' ' + str(b), args)
+    xbmc.log('===> ' + msg, xbmc.LOGNOTICE)

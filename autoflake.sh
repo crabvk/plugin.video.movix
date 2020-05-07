@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-poetry run autoflake -r --remove-all-unused-imports --remove-unused-variables "$@" *
+poetry run autoflake -r --remove-all-unused-imports --remove-unused-variables --exclude build "$@" *

@@ -1,4 +1,3 @@
-import json
 import xbmcgui
 import xbmcplugin
 import resources.lib.api as api

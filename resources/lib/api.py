@@ -33,7 +33,6 @@ def _headers(token):
 @show_progress(_('progress.device_registration'))
 def token():
     """Requests initial token is_bound=false"""
-
     url = ANDROID_HOST + '/token/device'
     params = dict(
         client_id='er_android_device',
@@ -133,6 +132,13 @@ def status(token):
 def bind_device(token):
     url = ANDROID_HOST + '/er/multiscreen/device/bind'
     resp = _request('post', url, headers=_headers(token), data={'title': 'Kodi'})
+    return Resp(resp.get('result'), resp.get('error'))
+
+
+# Used only in tests
+def unbind_device(token):
+    url = ANDROID_HOST + '/er/multiscreen/device/unbind'
+    resp = _request('post', url, headers=_headers(token), data={'device_id': DEVICE_ID})
     return Resp(resp.get('result'), resp.get('error'))
 
 
@@ -315,7 +321,7 @@ def _map_items(items, keys, res_map, limit=100, offset=0):
 def _request(method, url, **kwargs):
     resp = None
     try:
-        kwargs.setdefault('timeout', (7, 5))
+        kwargs.setdefault('timeout', 30)
         resp = requests.request(method, url, **kwargs)
     except ConnectionError:
         msg = _('error.connection_error')
