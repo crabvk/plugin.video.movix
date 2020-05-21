@@ -59,8 +59,8 @@ msgid "Contract number, email or phone"
 msgstr "Номер договора, email или телефон"
 
 msgctxt "#30014"
-msgid "Next page"
-msgstr "Следующая страница"
+msgid "Next page (%i left)"
+msgstr "Следующая страница (осталось %i)"
 
 msgctxt "#30015"
 msgid "Next page (%i of %i)"
@@ -111,37 +111,45 @@ msgid "Channels pagination"
 msgstr "Разбить каналы по страницам"
 
 msgctxt "#30027"
+msgid "Free movies only"
+msgstr "Только бесплатные фильмы"
+
+msgctxt "#30028"
 msgid "General"
 msgstr "Общие"
 
-msgctxt "#30028"
+msgctxt "#30029"
 msgid "Items per page"
 msgstr "Элементов на странице"
 
-msgctxt "#30029"
+msgctxt "#30030"
 msgid "Channel packages"
 msgstr "Пакеты каналов"
 
-msgctxt "#30030"
+msgctxt "#30031"
 msgid "Channels"
 msgstr "Каналы"
 
-msgctxt "#30031"
+msgctxt "#30032"
 msgid "Episodes"
 msgstr "Серии"
 
-msgctxt "#30032"
+msgctxt "#30033"
+msgid "Free movies"
+msgstr "Бесплатные фильмы"
+
+msgctxt "#30034"
 msgid "Movies"
 msgstr "Фильмы"
 
-msgctxt "#30033"
+msgctxt "#30035"
 msgid "Seasons"
 msgstr "Сезоны"
 
-msgctxt "#30034"
+msgctxt "#30036"
 msgid "Serials"
 msgstr "Сериалы"
 
-msgctxt "#30035"
+msgctxt "#30037"
 msgid "TV channels"
 msgstr "ТВ каналы"

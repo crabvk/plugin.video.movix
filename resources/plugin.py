@@ -21,8 +21,8 @@ router.add('/channels', channels, 'index', page=int)
 router.add('/channel-packages', channel_packages, 'index', page=int)
 router.add('/channel-packages/{id}/channels', channel_packages, 'channels', id=int, packages_page=int, adult=int)
 router.add('/movies', movies, 'index', offset=int)
-router.add('/serials', serials, 'index', page=int)
-router.add('/serials/{id}/seasons', serials, 'seasons', id=int, serials_page=int)
+router.add('/serials', serials, 'index', offset=int)
+router.add('/serials/{id}/seasons', serials, 'seasons', id=int, serials_offset=int)
 router.add('/episodes/season/{id}', serials, 'episodes', id=int, serial_id=int)
 
 if len(sys.argv) == 4:

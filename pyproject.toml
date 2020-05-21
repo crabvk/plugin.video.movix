@@ -1,6 +1,6 @@
 [tool.poetry]
 name = 'plugin.video.movix'
-version = '0.2.0'
+version = '0.3.0'
 description = 'Dom.ru Movix for kodi'
 license = 'MIT'
 authors = [

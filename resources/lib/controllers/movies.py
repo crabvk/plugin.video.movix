@@ -13,8 +13,9 @@ def index(router, params):
     handle = router.session.handle
     limit = utils.addon.getSettingInt('page_limit')
     offset = params.get('offset', 0)
+    free = utils.addon.getSettingBool('free_movies_only')
 
-    resp = api.movies(router.session.token['token'], limit, offset)
+    resp = api.movies(router.session.token['token'], limit, offset, free)
     movies = []
     for mov in resp['movies']:
         li = xbmcgui.ListItem(label=mov['title'], label2=mov['description'])
@@ -31,7 +32,8 @@ def index(router, params):
 
     # Next page
     if resp['offset'] < resp['total']:
-        li = xbmcgui.ListItem(label=_('li.next_page'))
+        label = _('li.next_page_left') % (resp['total'] - resp['offset'])
+        li = xbmcgui.ListItem(label=label)
         url = router.movies_url('index', offset=resp['offset'])
         movies.append((url, li, True))
 

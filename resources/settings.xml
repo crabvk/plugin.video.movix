@@ -3,5 +3,6 @@
     <category label="settings.general">
         <setting label="settings.page_limit" type="slider" id="page_limit" default="100" range="10,5,100" option="int" />
         <setting label="settings.channels_pagination" type="bool" id="channels_pagination" default="false" />
+        <setting label="settings.free_movies_only" type="bool" id="free_movies_only" default="false" />
     </category>
 </settings>

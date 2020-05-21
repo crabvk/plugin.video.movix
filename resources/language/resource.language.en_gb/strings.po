@@ -59,7 +59,7 @@ msgid "Contract number, email or phone"
 msgstr ""
 
 msgctxt "#30014"
-msgid "Next page"
+msgid "Next page (%i left)"
 msgstr ""
 
 msgctxt "#30015"
@@ -111,37 +111,45 @@ msgid "Channels pagination"
 msgstr ""
 
 msgctxt "#30027"
-msgid "General"
+msgid "Free movies only"
 msgstr ""
 
 msgctxt "#30028"
-msgid "Items per page"
+msgid "General"
 msgstr ""
 
 msgctxt "#30029"
-msgid "Channel packages"
+msgid "Items per page"
 msgstr ""
 
 msgctxt "#30030"
-msgid "Channels"
+msgid "Channel packages"
 msgstr ""
 
 msgctxt "#30031"
-msgid "Episodes"
+msgid "Channels"
 msgstr ""
 
 msgctxt "#30032"
-msgid "Movies"
+msgid "Episodes"
 msgstr ""
 
 msgctxt "#30033"
-msgid "Seasons"
+msgid "Free movies"
 msgstr ""
 
 msgctxt "#30034"
-msgid "Serials"
+msgid "Movies"
 msgstr ""
 
 msgctxt "#30035"
+msgid "Seasons"
+msgstr ""
+
+msgctxt "#30036"
+msgid "Serials"
+msgstr ""
+
+msgctxt "#30037"
 msgid "TV channels"
 msgstr ""

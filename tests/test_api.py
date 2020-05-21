@@ -99,7 +99,11 @@ def _test_package_channels():
 
 def _test_movies():
     assert auth is not None
-    resp = api.movies(auth['token'], 100, 500)
+    resp = api.movies(auth['token'], 100, 500, False)
+    assert has_keys(resp['movies'][0], ['id', 'title', 'description', 'hls_id'])
+    assert resp['total'] > 0
+    # Free movies
+    resp = api.movies(auth['token'], 10, 0, True)
     assert has_keys(resp['movies'][0], ['id', 'title', 'description', 'hls_id'])
     assert resp['total'] > 0
 
@@ -108,7 +112,7 @@ def _test_serials():
     assert auth is not None
     resp = api.serials(auth['token'], 100, 2)
     assert has_keys(resp['serials'][0], ['id', 'title', 'description', 'hls_id'])
-    assert resp['pages'] > 0
+    assert resp['total'] > 0
 
 
 def _test_seasons():

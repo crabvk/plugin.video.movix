@@ -12,9 +12,9 @@ from resources.lib.translation import _
 def index(router, params):
     handle = router.session.handle
     limit = utils.addon.getSettingInt('page_limit')
-    page = params.get('page', 1)
+    offset = params.get('offset', 0)
 
-    resp = api.serials(router.session.token['token'], limit, page)
+    resp = api.serials(router.session.token['token'], limit, offset)
     serials = []
     for srl in resp['serials']:
         li = xbmcgui.ListItem(label=srl['title'], label2=srl['description'])
@@ -25,14 +25,14 @@ def index(router, params):
             title=srl['title'],
             plot=srl['description']
         ))
-        url = router.serials_url('seasons', id=srl['id'], serials_page=page)
+        url = router.serials_url('seasons', id=srl['id'], serials_offset=offset)
         serials.append((url, li, True))
 
     # Next page
-    if page < resp['pages']:
-        label = _('li.next_page_number') % (page + 1, resp['pages'])
+    if resp['offset'] < resp['total']:
+        label = _('li.next_page_left') % (resp['total'] - resp['offset'])
         li = xbmcgui.ListItem(label=label)
-        url = router.serials_url('index', page=page + 1)
+        url = router.serials_url('index', offset=resp['offset'])
         serials.append((url, li, True))
 
     xbmcplugin.addDirectoryItems(handle, serials, len(serials))
@@ -40,7 +40,7 @@ def index(router, params):
     xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_TITLE)
 
 
-@api.on_error(lambda r, p: r.redirect('serials', 'index', page=p['serials_page']))
+@api.on_error(lambda r, p: r.redirect('serials', 'index', offset=p['serials_offset']))
 def seasons(router, params):
     handle = router.session.handle
 

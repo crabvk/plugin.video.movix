@@ -82,12 +82,12 @@ def patch_file(path, regex, repl):
 
 
 for path in pyfiles:
-    patch_file(path, r'_\((?:\'|").+(?:\'|")\)', repl_py)
+    patch_file(path, r'_\((?:\'|").+?(?:\'|")\)', repl_py)
 
 settings_path = os.path.join(DIR, 'resources/settings.xml')
 patch_file(settings_path, r'\slabel="(.+?)"', repl_settings)
 
-# Save strings.so for each language
+# Save strings.po for each language
 for lang in LANGS:
     po = polib.POFile()
     po_data = po_entries[lang]

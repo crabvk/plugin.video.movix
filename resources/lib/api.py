@@ -216,8 +216,8 @@ def package_channels(token, id, adult=0):
 
 @cache(CACHE_MAX_AGE)
 @show_progress(_('text.movies'))
-def movies(token, limit, offset):
-    url = STB_HOST + '/api/v3/showcases/library/movies'
+def movies(token, limit, offset, free):
+    url = STB_HOST + '/api/v3/showcases/library/' + ('freemovies' if free else 'movies')
     params = {'limit': '100', 'offset': str(offset)}
     resp = _request('get', url, params=params, headers=_headers(token))
     movs, offset = _map_items(resp['data']['items'], ['id', 'title', 'description'], {
@@ -230,16 +230,16 @@ def movies(token, limit, offset):
 
 @cache(CACHE_MAX_AGE)
 @show_progress(_('text.serials'))
-def serials(token, limit, page):
-    params = {'limit': str(limit), 'page': str(page)}
+def serials(token, limit, offset):
+    params = {'limit': '100', 'offset': str(offset)}
     url = STB_HOST + '/api/v3/showcases/library/serials'
     resp = _request('get', url, params=params, headers=_headers(token))
-    srls, _ = _map_items(resp['data']['items'], ['id', 'title', 'description'], {
+    srls, offset = _map_items(resp['data']['items'], ['id', 'title', 'description'], {
         'hls_id': 'hls',
         'poster_id': 'poster_blueprint',
         'fanart_id': '3_smarttv_serial_background_video_library_blueprint'
-    })
-    return {'serials': srls, 'pages': _pages(resp, limit)}
+    }, limit, offset)
+    return {'serials': srls, 'offset': offset, 'total': resp['data']['total']}
 
 
 @cache(CACHE_MAX_AGE)
