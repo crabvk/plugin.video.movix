@@ -5,17 +5,14 @@ import resources.lib.utils as utils
 from resources.lib.translation import _
 
 
+@api.on_error(lambda r: xbmcplugin.endOfDirectory(r.session.handle))
 def index(router, _params=None):
     handle = router.session.handle
     token = router.session.token
 
     if not token:
-        resp = api.token()
-        if not resp.ok:
-            utils.show_error(resp.data)
-            return xbmcplugin.endOfDirectory(handle)
-        utils.write_file('token.json', resp.data_str)
-        token = resp.data
+        token = api.token()
+        utils.write_file('token.json', token)
 
     items = []
 
@@ -26,22 +23,15 @@ def index(router, _params=None):
         items.append((url, li, True))
 
     if token['is_bound']:
-        resp = api.status(
+        status = api.status(
             token['token'],
             invalidate_cache=(handle == 1),
             cache_condition=lambda d: d.get('is_bound')
         )
-        if not resp.ok:
-            utils.show_error(resp.data)
-            return xbmcplugin.endOfDirectory(handle)
 
         # TODO: handle case with no slot available for device
-        if not resp.data['is_bound']:
-            resp = api.bind_device(token['token'])
-            if not resp.ok:
-                if utils.show_error(resp.data, ask=_('button.try_again')):
-                    return index(router)
-                return xbmcplugin.endOfDirectory(handle)
+        if not status['is_bound']:
+            api.bind_device(token['token'])
 
         # Channels
         add_channels_item(_('text.channels'))
@@ -79,6 +69,7 @@ def index(router, _params=None):
     xbmcplugin.endOfDirectory(handle, updateListing=router.session.is_redirect)
 
 
+@api.on_error(lambda r: r.redirect('root', 'index'))
 def sign_in(router, params):
     dialog = xbmcgui.Dialog()
 
@@ -91,10 +82,7 @@ def sign_in(router, params):
         return router.redirect('root', 'index')
 
     token = router.session.token
-    resp = api.regions(token['token'])
-    if not resp.ok:
-        utils.show_error(resp.data)
-        return router.redirect('root', 'index')
+    regions = api.regions(token['token'])
 
     # Try to get region from contract number
     region = None
@@ -105,22 +93,18 @@ def sign_in(router, params):
         except ValueError:
             pass
         if code:
-            region = next((r for r in resp.data if r['code'] == code), None)
+            region = next((r for r in regions if r['code'] == code), None)
 
     # User selects a region
     if not region:
-        pos = dialog.select(_('label.city'), list(map(lambda r: r['title'], resp.data)))
+        pos = dialog.select(_('label.city'), list(map(lambda r: r['title'], regions)))
         if pos < 0:
             return router.redirect('root', 'index')
-        region = resp.data[pos]
+        region = regions[pos]
 
-    resp = api.auth(token['token'], username, password, region['extid'])
-    if not resp.ok:
-        utils.show_error(resp.data)
-        return router.redirect('root', 'index')
-
-    utils.write_file('token.json', resp.data_str)
-    router.redirect('root', 'index', token=resp.data)
+    token = api.auth(token['token'], username, password, region['extid'])
+    utils.write_file('token.json', token)
+    router.redirect('root', 'index', token=token)
 
 
 def sign_in_sms(router, params):
@@ -132,30 +116,24 @@ def sign_in_sms(router, params):
 
     token = router.session.token
     resp = api.sms_auth(token['token'], phone)
-    if not resp.ok:
-        utils.show_error(resp.data)
-        return router.redirect('root', 'index')
 
-    if not resp.data['send_sms']:
-        utils.show_error(resp.data)
+    if not resp['send_sms']:
+        utils.show_error(resp)
 
     code = dialog.input(_('label.sms_code'), type=xbmcgui.INPUT_NUMERIC)
     if not code:
         return router.redirect('root', 'index')
 
-    resp = api.sms_check(token['token'], phone, resp.data['region'], resp.data['agr_id'], code)
-    if not resp.ok:
-        utils.show_error(resp.data)
-        return router.redirect('root', 'index')
-
-    utils.write_file('token.json', resp.data_str)
-    router.redirect('root', 'index', token=resp.data)
+    token = api.sms_check(token['token'], phone, resp['region'], resp['agr_id'], code)
+    utils.write_file('token.json', token)
+    router.redirect('root', 'index', token=token)
 
 
 def play(router, params):
-    resp = api.playlist_url(router.session.token['token'], params['id'], params['hls_id'])
-    url = resp.data if resp.ok else None
-    li = xbmcgui.ListItem(path=url)
-    xbmcplugin.setResolvedUrl(router.session.handle, bool(resp.ok), li)
-    if not resp.ok:
-        utils.show_error(resp.data)
+    handle = router.session.handle
+    try:
+        url = api.playlist_url(router.session.token['token'], params['id'], params['hls_id'])
+        xbmcplugin.setResolvedUrl(handle, True, xbmcgui.ListItem(path=url))
+    except api.ApiResponseError as e:
+        xbmcplugin.setResolvedUrl(handle, False, xbmcgui.ListItem())
+        utils.show_error(e.error)

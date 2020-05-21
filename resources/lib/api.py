@@ -7,9 +7,10 @@ import requests
 import hashlib
 import uuid
 import time
+from functools import wraps
 from requests.exceptions import RequestException, ConnectionError, ConnectTimeout, ReadTimeout
 import resources.lib.utils as utils
-from resources.lib.utils import Resp, show_progress, cache
+from resources.lib.utils import show_progress, cache
 from resources.lib.translation import _
 
 CACHE_MAX_AGE = 1800  # 30 minutes
@@ -19,9 +20,21 @@ DEVICE_ID = hashlib.sha1(str(uuid.getnode())).hexdigest()[-16:]
 HEADERS = {
     'X-Device-Info': DEVICE_ID,
     'View': 'stb3',
-    'X-App-Version': '3.9.3',
+    'X-App-Version': '3.9.5',
     'User-Agent': xbmc.getUserAgent()
 }
+
+
+class ApiRequestError(Exception):
+    def __init__(self, message):
+        super(ApiRequestError, self).__init__(message)
+        self.error = {'message': message}
+
+
+class ApiResponseError(Exception):
+    def __init__(self, error):
+        super(ApiResponseError, self).__init__(error.get('message'))
+        self.error = error
 
 
 def _headers(token):
@@ -40,9 +53,7 @@ def token():
         timestamp=str(int(time.time()))
     )
     resp = _request('get', url, params=params, headers=HEADERS)
-    if not resp.get('result'):
-        return Resp(0, resp.get('error'))
-    return Resp(1, utils.subset(resp, 'is_bound', 'token', 'expires'))
+    return utils.subset(resp, 'is_bound', 'token', 'expires')
 
 
 @cache(CACHE_MAX_AGE)
@@ -50,15 +61,12 @@ def token():
 def regions(token):
     url = ANDROID_HOST + '/er/misc/domains'
     resp = _request('get', url, headers=_headers(token))
-    if not resp.get('result'):
-        return Resp(0, resp.get('error'))
-
     domains = []
     for item in resp['domains']:
         if item['code']:
             domain = utils.subset(item, 'extid', 'code', 'title')
             domains.append(domain)
-    return Resp(1, domains)
+    return domains
 
 
 @show_progress(_('progress.auth'))
@@ -68,15 +76,11 @@ def auth(token, username, password, region):
     url = ANDROID_HOST + '/er/ssoauth/auth'
     data = dict(username=username, password=password, region=region)
     resp = _request('post', url, headers=_headers(token), data=data)
-    if not resp.get('result'):
-        return Resp(0, resp.get('error'))
 
     url = ANDROID_HOST + '/token/subscriber_device/by_sso'
     params = dict(sso_system='er', sso_key=resp['sso'])
     resp = _request('get', url, params=params, headers=_headers(token))
-    if not resp.get('result'):
-        return Resp(0, resp.get('error'))
-    return Resp(1, utils.subset(resp, 'is_bound', 'token', 'expires'))
+    return utils.subset(resp, 'is_bound', 'token', 'expires')
 
 
 @show_progress(_('progress.sms_request'))
@@ -84,18 +88,13 @@ def sms_auth(token, phone):
     url = ANDROID_HOST + '/er/ott/get_agreements_by_phone'
     params = {'phone_number': phone}
     resp = _request('get', url, params=params, headers=_headers(token))
-    if not resp.get('result'):
-        return Resp(0, resp.get('error'))
     if not resp['principals']:
-        return Resp(0, {'message': _('error.contract_not_found') % phone})
+        raise ApiResponseError({'message': _('error.contract_not_found') % phone})
 
     url = ANDROID_HOST + '/er/sms/auth'
     region = resp['principals'][0]['domain']
     data = {'phone': phone, 'region': region}
     resp = _request('post', url, headers=_headers(token), data=data)
-    if not resp.get('result'):
-        return Resp(0, resp.get('error'))
-
     result = utils.subset(
         resp['agreements'],
         'send_sms',
@@ -103,7 +102,7 @@ def sms_auth(token, phone):
         (lambda d: d['agreement'][0]['agr_id'], 'agr_id')
     )
     result['region'] = region
-    return Resp(1, result)
+    return result
 
 
 @show_progress(_('progress.sms_check'))
@@ -111,11 +110,9 @@ def sms_check(token, phone, region, agr_id, sms_code):
     url = ANDROID_HOST + '/er/sms/check'
     data = {'phone': phone, 'region': region, 'agr_id': str(agr_id), 'sms_code': str(sms_code)}
     resp = _request('post', url, headers=_headers(token), data=data)
-    if not resp.get('result'):
-        return Resp(0, resp.get('error'))
     if not resp.get('token'):
-        return Resp(0, {'message': resp['Agreements']['sms_error_text']})
-    return Resp(1, utils.subset(resp, 'is_bound', 'token', 'expires'))
+        raise ApiResponseError({'message': resp['Agreements']['sms_error_text']})
+    return utils.subset(resp, 'is_bound', 'token', 'expires')
 
 
 @cache(7200)
@@ -123,23 +120,25 @@ def sms_check(token, phone, region, agr_id, sms_code):
 def status(token):
     url = ANDROID_HOST + '/er/multiscreen/status'
     resp = _request('get', url, headers=_headers(token))
-    if not resp.get('result'):
-        return Resp(0, resp.get('error'))
-    return Resp(1, resp['status'])
+    return resp['status']
 
 
 @show_progress(_('progress.binding'))
 def bind_device(token):
     url = ANDROID_HOST + '/er/multiscreen/device/bind'
-    resp = _request('post', url, headers=_headers(token), data={'title': 'Kodi'})
-    return Resp(resp.get('result'), resp.get('error'))
+    _request('post', url, headers=_headers(token), data={'title': 'Kodi'})
 
 
 # Used only in tests
-def unbind_device(token):
+def devices(token):
+    url = ANDROID_HOST + '/er/multiscreen/devices'
+    resp = _request('get', url, headers=_headers(token))
+    return resp['devices']
+
+
+def unbind_device(token, id):
     url = ANDROID_HOST + '/er/multiscreen/device/unbind'
-    resp = _request('post', url, headers=_headers(token), data={'device_id': DEVICE_ID})
-    return Resp(resp.get('result'), resp.get('error'))
+    _request('post', url, headers=_headers(token), data={'device_id': id})
 
 
 @cache(CACHE_MAX_AGE)
@@ -148,14 +147,11 @@ def channels(token, limit, page):
     url = STB_HOST + '/api/v3/showcases/library/channels'
     params = {'limit': str(limit), 'page': str(page)}
     resp = _request('get', url, params=params, headers=_headers(token))
-    if not resp.has_key('data'):
-        return Resp(0, resp.get('error'))
-
     chs, _ = _map_items(resp['data']['items'], ['id', 'title', 'description', 'lcn'], {
         'hls_id': 'hls',
         'poster_id': 'poster_channel_grid_blueprint'
     })
-    return Resp(1, chs, {'pages': _pages(resp, limit)})
+    return {'channels': chs, 'pages': _pages(resp, limit)}
 
 
 @cache(CACHE_MAX_AGE)
@@ -163,9 +159,6 @@ def channels(token, limit, page):
 def channels_all(token, public=False):
     url = ANDROID_HOST + '/channel_list/multiscreen'
     resp = _request('get', url, headers=_headers(token))
-    if not resp.get('result'):
-        return Resp(0, resp.get('error'))
-
     chs = []
     for item in resp['collection']:
         ch = utils.subset(item, 'id', 'title', 'description', ('er_lcn', 'lcn'))
@@ -178,15 +171,13 @@ def channels_all(token, public=False):
         }
         ch.update(res)
         chs.append(ch)
-    return Resp(1, chs)
+    return {'channels': chs}
 
 
 def playlist_url(token, channel_id, hls_id):
     url = ANDROID_HOST + '/resource/get_url/%i/%i' % (channel_id, hls_id)
     resp = _request('get', url, headers=_headers(token))
-    if not resp.get('result'):
-        return Resp(0, resp.get('error'))
-    return Resp(1, resp['url'])
+    return resp['url']
 
 
 def art_url(art_id, w=0, h=0):
@@ -202,15 +193,12 @@ def channel_packages(token, limit, page):
     url = STB_HOST + '/api/v3/showcases/library/channel-packages'
     params = {'limit': str(limit), 'page': str(page)}
     resp = _request('get', url, params=params, headers=_headers(token))
-    if not resp.has_key('data'):
-        return Resp(0, resp.get('error'))
-
     pkgs, _ = _map_items(resp['data']['items'],
                          ['id', 'title', 'description', (lambda i: i['adult']['type'], 'adult')], {
         'poster_id': '3_smarttv_package_poster_video_library_blueprint',
         'fanart_id': '3_smarttv_asset_background_banner_fullscreen_blueprint'
     })
-    return Resp(1, pkgs, {'pages': _pages(resp, limit)})
+    return {'packages': pkgs, 'pages': _pages(resp, limit)}
 
 
 @cache(CACHE_MAX_AGE)
@@ -219,14 +207,11 @@ def package_channels(token, id, adult=0):
     url = STB_HOST + '/api/v3/showcases/children/channel-package/%i/channels' % id
     params = {'adult': 'adult,not-adult'} if adult else None
     resp = _request('get', url, params=params, headers=_headers(token))
-    if not resp.has_key('data'):
-        return Resp(0, resp.get('error'))
-
     chs, _ = _map_items(resp['data']['items'], ['id', 'title', 'description', 'lcn'], {
         'hls_id': 'hls',
         'poster_id': 'poster_channel_grid_blueprint'
     })
-    return Resp(1, chs)
+    return {'channels': chs}
 
 
 @cache(CACHE_MAX_AGE)
@@ -235,15 +220,12 @@ def movies(token, limit, offset):
     url = STB_HOST + '/api/v3/showcases/library/movies'
     params = {'limit': '100', 'offset': str(offset)}
     resp = _request('get', url, params=params, headers=_headers(token))
-    if not resp.has_key('data'):
-        return Resp(0, resp.get('error'))
-
     movs, offset = _map_items(resp['data']['items'], ['id', 'title', 'description'], {
         'hls_id': 'hls',
         'poster_id': 'poster_blueprint',
         'fanart_id': '3_smarttv_asset_background_video_library_blueprint'
     }, limit, offset)
-    return Resp(1, movs, {'offset': offset, 'total': resp['data']['total']})
+    return {'movies': movs, 'offset': offset, 'total': resp['data']['total']}
 
 
 @cache(CACHE_MAX_AGE)
@@ -252,15 +234,12 @@ def serials(token, limit, page):
     params = {'limit': str(limit), 'page': str(page)}
     url = STB_HOST + '/api/v3/showcases/library/serials'
     resp = _request('get', url, params=params, headers=_headers(token))
-    if not resp.has_key('data'):
-        return Resp(0, resp.get('error'))
-
     srls, _ = _map_items(resp['data']['items'], ['id', 'title', 'description'], {
         'hls_id': 'hls',
         'poster_id': 'poster_blueprint',
         'fanart_id': '3_smarttv_serial_background_video_library_blueprint'
     })
-    return Resp(1, srls, {'pages': _pages(resp, limit)})
+    return {'serials': srls, 'pages': _pages(resp, limit)}
 
 
 @cache(CACHE_MAX_AGE)
@@ -268,14 +247,11 @@ def serials(token, limit, page):
 def seasons(token, serial_id):
     url = STB_HOST + '/api/v3/showcases/seasons/serial/%i/seasons' % serial_id
     resp = _request('get', url, headers=_headers(token))
-    if not resp.has_key('data'):
-        return Resp(0, resp.get('error'))
-
     sns, _ = _map_items(resp['data']['items'], ['id', 'title', 'description', 'number'], {
         'poster_id': 'poster_blueprint',
         'fanart_id': '3_smarttv_season_background_video_library_blueprint'
     })
-    return Resp(1, sns)
+    return {'seasons': sns}
 
 
 @cache(CACHE_MAX_AGE)
@@ -283,9 +259,6 @@ def seasons(token, serial_id):
 def episodes(token, season_id):
     url = STB_HOST + '/api/v3/showcases/episodes/season/%i/episodes' % season_id
     resp = _request('get', url, headers=_headers(token))
-    if not resp.has_key('data'):
-        return Resp(0, resp.get('error'))
-
     epds, _ = _map_items(resp['data']['items'], ['id', 'title', 'description', 'number'], {
         'hls_id': 'hls',
         'poster_id': [
@@ -294,7 +267,7 @@ def episodes(token, season_id):
             'poster_blueprint'
         ]
     })
-    return Resp(1, epds)
+    return {'episodes': epds}
 
 
 def _map_items(items, keys, res_map, limit=100, offset=0):
@@ -332,9 +305,29 @@ def _request(method, url, **kwargs):
     except RequestException:
         msg = _('error.request_exception')
     if resp == None:
-        return {'error': {'message': msg}}
-    return resp.json()
+        raise ApiRequestError(msg)
+
+    data = resp.json()
+    if 'error' in data:
+        raise ApiResponseError(data['error'])
+    return data
 
 
 def _pages(resp, limit):
     return int(math.ceil(resp['data']['total'] / float(limit)))
+
+
+def on_error(callback):
+    def decorator(func):
+
+        @wraps(func)
+        def wrapper(router, params):
+            try:
+                func(router, params)
+            except (ApiRequestError, ApiResponseError) as e:
+                utils.show_error(e.error)
+                args = [router] if callback.func_code.co_argcount == 1 else [router, params]
+                callback(*args)
+
+        return wrapper
+    return decorator

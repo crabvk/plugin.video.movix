@@ -2,6 +2,7 @@
 import os
 import time
 import shutil
+import json
 from functools import wraps
 from mock import patch
 import resources.lib.utils as utils
@@ -25,7 +26,7 @@ class Stat:
 def cached_resp(cache_key, max_age):
     cached = utils._get_cache(cache_key, max_age)
     if cached:
-        return utils.Resp.from_string(cached)
+        return json.loads(cached)
 
 
 def patch_cache(func):
@@ -63,7 +64,7 @@ def test_show_error_default_ru(Dialog):
 
 
 def func1(arg):
-    return utils.Resp(1, {'item': arg})
+    return {'item': arg}
 
 
 cached_func1 = utils.cache(300)(func1)

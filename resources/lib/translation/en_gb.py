@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 en_gb = [
-('button.cancel',                'Cancel'),
-('button.try_again',             'Try again'),
 ('error.connection_error',       'Internet connection error'),
 ('error.connect_timeout',        'Request timed out while trying to connect to the server'),
 ('error.contract_not_found',     'Contract number not found by phone number %s'),

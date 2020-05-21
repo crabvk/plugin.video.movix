@@ -16,7 +16,7 @@
         <language>ru</language>
         <platform>all</platform>
         <license>MIT</license>
-        <!-- <forum></forum> -->
+        <forum>http://xbmc.ru/forum/showthread.php?p=147834</forum>
         <website>https://movix.ru/</website>
         <email>vyachkonovalov@protonmail.com</email>
         <source>https://github.com/vyachkonovalov/plugin.video.movix</source>

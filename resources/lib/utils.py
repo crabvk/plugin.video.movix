@@ -19,30 +19,6 @@ if not xbmcvfs.exists(CACHE_PATH):
     xbmcvfs.mkdir(CACHE_PATH)
 
 
-class Resp():
-    def __init__(self, ok, data, meta=None):
-        self.ok = ok
-        self.data = data
-        self.meta = meta
-
-    def __str__(self):
-        return json.dumps({'data': self.data, 'meta': self.meta}, separators=(',', ':'))
-
-    def __eq__(self, resp):
-        if not isinstance(resp, Resp):
-            return False
-        return self.ok == resp.ok and self.data == resp.data and self.meta == resp.meta
-
-    @property
-    def data_str(self):
-        return json.dumps(self.data, separators=(',', ':'))
-
-    @staticmethod
-    def from_string(string):
-        resp = json.loads(string)
-        return Resp(1, resp['data'], resp['meta'])
-
-
 def subset(data, *keys):
     """
     Gets subset of data with given keys
@@ -59,7 +35,11 @@ def subset(data, *keys):
     return result
 
 
-def write_file(path, string):
+def write_file(path, string_or_dict):
+    if isinstance(string_or_dict, str):
+        string = string_or_dict
+    else:
+        string = json.dumps(string_or_dict, separators=(',', ':'))
     filepath = os.path.join(STORAGE_PATH, path)
     file = xbmcvfs.File(filepath, 'w')
     file.write(string)
@@ -110,19 +90,18 @@ def cache(max_age):
             m_age = 0 if kwargs.get('invalidate_cache') else max_age
             string = _get_cache(key, m_age)
             if string:
-                return Resp.from_string(string)
+                return json.loads(string)
             resp = func(*args)
-            if resp.ok:
-                cond = kwargs.get('cache_condition')
-                if cond == None or cond(resp.data):
-                    write_file('cache/' + key, str(resp))
+            cond = kwargs.get('cache_condition')
+            if cond == None or cond(resp):
+                write_file('cache/' + key, resp)
             return resp
 
         return wrapper
     return decorator
 
 
-def show_error(error, ask=None):
+def show_error(error):
     default_header = _('error.default_header')
     default_message = _('error.default_message')
     if LANG == 'ru':
@@ -134,8 +113,6 @@ def show_error(error, ask=None):
         message = message.capitalize()
 
     dialog = xbmcgui.Dialog()
-    if ask:
-        return dialog.yesno(header, message, nolabel=_('button.cancel'), yeslabel=ask)
     return dialog.ok(header, message)
 
 
@@ -158,5 +135,5 @@ def show_progress(message):
 
 
 def log(*args):
-    msg = reduce(lambda a, b: str(a) + ' ' + str(b), args)
-    xbmc.log('===> ' + msg, xbmc.LOGNOTICE)
+    msg = reduce(lambda a, b: str(a) + ' ' + str(b), args, '')
+    xbmc.log('===>' + msg, xbmc.LOGNOTICE)

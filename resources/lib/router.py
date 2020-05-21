@@ -67,7 +67,7 @@ class Router:
         if path_params:
             try:
                 path = path.format(**params)
-            except KeyError, e:
+            except KeyError as e:
                 raise ValueError('Required parameter %s is missing for %s' % (e, path))
             for pp in path_params:
                 params.pop(pp, None)

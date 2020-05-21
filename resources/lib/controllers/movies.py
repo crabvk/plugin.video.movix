@@ -8,19 +8,15 @@ import resources.lib.utils as utils
 from resources.lib.translation import _
 
 
+@api.on_error(lambda r: r.redirect('root', 'index'))
 def index(router, params):
     handle = router.session.handle
     limit = utils.addon.getSettingInt('page_limit')
     offset = params.get('offset', 0)
 
     resp = api.movies(router.session.token['token'], limit, offset)
-    if not resp.ok:
-        if utils.show_error(resp.data, ask=_('button.try_again')):
-            return index(router, params)
-        return router.redirect('root', 'index')
-
     movies = []
-    for mov in resp.data:
+    for mov in resp['movies']:
         li = xbmcgui.ListItem(label=mov['title'], label2=mov['description'])
         li.setArt({'poster': api.art_url(mov['poster_id'])})
         if mov['fanart_id']:
@@ -34,9 +30,9 @@ def index(router, params):
         movies.append((url, li, False))
 
     # Next page
-    if resp.meta['offset'] < resp.meta['total']:
+    if resp['offset'] < resp['total']:
         li = xbmcgui.ListItem(label=_('li.next_page'))
-        url = router.movies_url('index', offset=resp.meta['offset'])
+        url = router.movies_url('index', offset=resp['offset'])
         movies.append((url, li, True))
 
     xbmcplugin.addDirectoryItems(handle, movies, len(movies))

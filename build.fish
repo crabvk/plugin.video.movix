@@ -40,6 +40,8 @@ cp resources/lib/translation/__init__.py build/resources/lib/translation.py
 poetry run python gen_strings_po.py build >/dev/null
 if [ $status = 0 ]
     cp -r build/resources/language resources
+else
+    exit 1
 end
 
 # Create .zip

@@ -8,6 +8,7 @@ import resources.lib.utils as utils
 from resources.lib.translation import _
 
 
+@api.on_error(lambda r: r.redirect('root', 'index'))
 def index(router, params):
     handle = router.session.handle
     token = router.session.token
@@ -20,13 +21,8 @@ def index(router, params):
     else:
         resp = api.channels_all(token['token'], not token['is_bound'])
 
-    if not resp.ok:
-        if utils.show_error(resp.data, ask=_('button.try_again')):
-            return index(router, params)
-        return router.redirect('root', 'index')
-
     channels = []
-    for ch in resp.data:
+    for ch in resp['channels']:
         li = xbmcgui.ListItem(label=ch['title'], label2=ch['description'])
         li.setArt({'poster': api.art_url(ch['poster_id'])})
         li.setInfo('video', dict(
@@ -39,9 +35,9 @@ def index(router, params):
         channels.append((url, li, False))
 
     # Next page
-    if paginate and page < resp.meta['pages']:
+    if paginate and page < resp['pages']:
         url = router.channels_url('index', page=page + 1)
-        label = _('li.next_page_number') % (page + 1, resp.meta['pages'])
+        label = _('li.next_page_number') % (page + 1, resp['pages'])
         li = xbmcgui.ListItem(label=label)
         channels.append((url, li, True))
 

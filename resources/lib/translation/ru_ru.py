@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 ru_ru = [
-('button.cancel',                'Отмена'),
-('button.try_again',             'Повторить'),
 ('error.connection_error',       'Ошибка подключения к интернету'),
 ('error.connect_timeout',        'Тайм-аут запроса при попытке подключения к серверу'),
 ('error.contract_not_found',     'Не найден номер договора по номеру телефона %s'),
