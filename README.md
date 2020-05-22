@@ -1,53 +1,45 @@
-# Dom&#46;ru Movix for Kodi
+[This README in English](README.en.md)
 
-Unofficial Kodi plugin for [Dom.ru Movix Online Theater](https://movix.ru/).
+# Дом&#46;ru Movix для Kodi
 
-**NOTE**: You need a [Dom.ru account](https://domru.ru/request) to access Movix content using this plugin.
+Неофициальный Kodi плагин для [онлайн-кинотеатра Дом.ru Movix](https://movix.ru/).
 
-## Features
+**ПРИМЕЧАНИЕ**: Вам необходим [аккаунт Дом.ru](https://domru.ru/request) для доступа к Movix контенту используя этот плагин.
 
-* Sign in (with password or SMS)
-* Watch live channels
-* Browse channel packages
-* Watch movies and serials
+## Возможности
 
-## Limitations
+* Вход (по паролю или SMS)
+* Просмотр каналов в прямом эфире
+* Просмотр пакетов каналов
+* Просмотр фильмов и сериалов
 
-* No parental control. This plugin shows all adult content.
-* No paid content. You can't see or buy paid content with this plugin
-(use [movix.ru](https://movix.ru) or
-[Movix Android app](https://play.google.com/store/apps/details?id=com.ertelecom.domrutv) instead).
-However, anything already bought should be accessible.
+## Ограничения
 
-## Installation
+* Нет родительского контроля. Плагин показывает весь контект для взрослых.
+* Нет платного контента. Нет просмотра и возможности покупки платного контента 
+(используйте [movix.ru](https://movix.ru) или
+[Movix Android app](https://play.google.com/store/apps/details?id=com.ertelecom.domrutv) для этого).
+Тем не менее, все что уже куплено должно быть доступно.
 
-1. Download latest `plugin.video.movix-x.y.z.zip` from
-[releases](https://github.com/vyachkonovalov/plugin.video.movix/releases)
-2. Open Kodi: Add-ons ⇒ Install from zip file
+## Установка
 
-## How to
+1. Скачайте последний `plugin.video.movix-x.y.z.zip` из
+[релизов](https://github.com/vyachkonovalov/plugin.video.movix/releases)
+2. Откройте Kodi: Дополнения ⇒ Установить из файла ZIP
 
-### Use single device slot for multiple plugin installs
+## Кого чего
 
-[Not ready yet](https://github.com/vyachkonovalov/plugin.video.movix/projects/1#card-36378995)
+### Единственный слот устройства для нескольких установок плагина
 
-### Sign out
+[Пока неготово](https://github.com/vyachkonovalov/plugin.video.movix/projects/1#card-36378995)
 
-Do one of the following:
+### Разлогиниться
 
-* `rm -rf ~/.kodi/userdata/addon_data/plugin.video.movix/*` and restart Kodi.
-* Uninstall add-on: choose 'Yes' when Kodi asks to remove all related data.
+Сделайте одно из следующих:
 
-You may also want to remove the plugin from connected devices. Use
+* `rm -rf ~/.kodi/userdata/addon_data/plugin.video.movix/*` и перезапустить Kodi.
+* Удалить плагин: выбрать 'Да' когда Kodi спросит об удалении всей сопутствующей информации.
+
+Вы также можете удалить плагин из подключенных устройств. Используйте
 [Movix Android app](https://play.google.com/store/apps/details?id=com.ertelecom.domrutv)
-or [movix.ru](https://movix.ru/profile/connected-devices).
-
-## Terminology
-
-HLS - **H**TTP **L**ive **S**treaming  
-LCN - **L**ogical **C**hannel **N**umber
-
-## Useful tools
-
-[JSON Editor Online](https://jsoneditoronline.org/)  
-[HttpCanary](https://httpcanary.com/en/)
+или [movix.ru](https://movix.ru/profile/connected-devices).
