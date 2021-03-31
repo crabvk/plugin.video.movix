@@ -1,5 +1,5 @@
 def has_keys(data, keys):
-    return all(map(lambda k: data.has_key(k), keys))
+    return all(map(lambda k: k in data, keys))
 
 
 def dict_types(d):

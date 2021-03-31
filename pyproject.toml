@@ -1,19 +1,19 @@
 [tool.poetry]
-name = 'plugin.video.movix'
-version = '0.4.0'
-description = 'Dom.ru Movix for Kodi'
-license = 'MIT'
+name = "plugin.video.movix"
+version = "0.4.0"
+description = "Dom.ru Movix for Kodi"
+license = "MIT"
 authors = [
-    'Vyacheslav Konovalov <crabvk@protonmail.com>'
+    "Vyacheslav Konovalov <crabvk@protonmail.com>"
 ]
-readme = 'README.md'
-repository = 'https://github.com/crabvk/plugin.video.movix'
-homepage = 'https://github.com/crabvk/plugin.video.movix'
-keywords = ['domrutv', 'movix', 'kodi-plugin', 'kodi-addon']
+readme = "README.md"
+repository = "https://github.com/crabvk/plugin.video.movix"
+homepage = "https://github.com/crabvk/plugin.video.movix"
+keywords = ["domrutv", "movix", "kodi-plugin", "kodi-addon"]
 
 [tool.poetry.dependencies]
-python = '~3.6'
-requests = '2.22.0'
+python = "~3.6"
+requests = "2.22.0"
 Kodistubs = "^19.0.2"
 
 [tool.poetry.dev-dependencies]
