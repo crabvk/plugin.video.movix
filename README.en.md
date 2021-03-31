@@ -21,14 +21,14 @@ However, anything already bought should be accessible.
 ## Installation
 
 1. Download latest `plugin.video.movix-x.y.z.zip` from
-[releases](https://github.com/vyachkonovalov/plugin.video.movix/releases)
+[releases](https://github.com/crabvk/plugin.video.movix/releases)
 2. Open Kodi: Add-ons ⇒ Install from zip file
 
 ## How to
 
 ### Use single device slot for multiple plugin installs
 
-[Not ready yet](https://github.com/vyachkonovalov/plugin.video.movix/projects/1#card-36378995)
+[Not ready yet](https://github.com/crabvk/plugin.video.movix/projects/1#card-36378995)
 
 ### Sign out
 

@@ -1,6 +1,3 @@
-from future import standard_library
-standard_library.install_aliases()  # noqa: E402
-
 import math
 import xbmc
 import requests
@@ -16,7 +13,7 @@ from resources.lib.translation import _
 CACHE_MAX_AGE = 1800  # 30 minutes
 ANDROID_HOST = 'https://discovery-android-26.ertelecom.ru'
 STB_HOST = 'https://discovery-stb3.ertelecom.ru'
-DEVICE_ID = hashlib.sha1(str(uuid.getnode())).hexdigest()[-16:]
+DEVICE_ID = hashlib.sha1(str(uuid.getnode()).encode('utf8')).hexdigest()[-16:]
 HEADERS = {
     'X-Device-Info': DEVICE_ID,
     'View': 'stb3',
@@ -296,10 +293,10 @@ def _request(method, url, **kwargs):
     try:
         kwargs.setdefault('timeout', 30)
         resp = requests.request(method, url, **kwargs)
-    except ConnectionError:
-        msg = _('error.connection_error')
     except ConnectTimeout:
         msg = _('error.connect_timeout')
+    except ConnectionError:
+        msg = _('error.connection_error')
     except ReadTimeout:
         msg = _('error.read_timeout')
     except RequestException:

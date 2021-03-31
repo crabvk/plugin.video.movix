@@ -1,1 +1,1 @@
-import resources.plugin  # noqa
+import resources.plugin

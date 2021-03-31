@@ -1,5 +1,7 @@
 #!/usr/bin/env fish
 
+argparse z/zip -- $argv
+
 # Check for required dependencies
 for cmd in poetry fd rg
     command -q $cmd
@@ -9,47 +11,47 @@ for cmd in poetry fd rg
     end
 end
 
-rm -rf build/
-mkdir build
 
-cp addon.xml default.py LICENSE.txt README.md build
-cp -r resources build
+set build_dir (mktemp -dt 'movix-build.XXXXXXX')
 
-cd build
+cp addon.xml default.py LICENSE.txt README.md $build_dir
+cp -r resources $build_dir
+
+pushd $build_dir
 rm -rf resources/lib/translation
-for f in (fd -tf '.*\.py[c|o]$')
-    rm $f
-end
-for d in (fd -td '__pycache__')
-    rm -rf $d
+fd -tf '\.py[oc]$' -x rm
+fd -td __pycache__ -x rm -rf
+
+# Remove log calls
+for file in (rg -l '\.log\(' -g '*.py')
+    sed -i '/.log(/d' $file
 end
 
-# Search for logs in python code
-if not contains -- $argv '--ignore-log'
-    rg '\.log\('
-    if [ $status = 0 ]
-        echo -e '\n^^^ The build can\'t contain log calls ^^^'
-        exit 1
-    end
-end
-
-cd ..
-cp resources/lib/translation/__init__.py build/resources/lib/translation.py
+popd
+cp resources/lib/translation/__init__.py $build_dir/resources/lib/translation.py
 
 # Generate strings.po
-poetry run python gen_strings_po.py build >/dev/null
+poetry run python gen_strings_po.py $build_dir >/dev/null
+
 if [ $status = 0 ]
-    cp -r build/resources/language resources
+    cp -r $build_dir/resources/language resources
 else
+    echo 'Error occured while running gen_strings_po.py' >&2
     exit 1
 end
 
 # Create .zip
-if contains -- $argv '--zip'
+if set -q _flag_z
     set name plugin.video.movix
     set ver (rg -or '$1' '<addon.+version="(.+?)"' addon.xml)
-    fd -d1 "$name\-[\d\.]+\.zip" -x rm
-    mv build $name
-    zip $name-$ver.zip -r $name
-    mv $name build
+    set tmp_dir (mktemp -dt 'movix-build.XXXXXXX')
+
+    mv $build_dir $tmp_dir/$name
+    pushd $tmp_dir
+    zip -r $name-$ver.zip $name
+    popd
+    mv $tmp_dir/$name-$ver.zip .
+    rm -rf $tmp_dir
+else
+    echo "Built in $build_dir"
 end

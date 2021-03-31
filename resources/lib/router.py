@@ -1,6 +1,3 @@
-from future import standard_library
-standard_library.install_aliases()  # noqa: E402
-
 from urllib.parse import parse_qsl, urlencode, urlparse
 import re
 import resources.lib.utils as utils

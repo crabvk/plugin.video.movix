@@ -24,14 +24,14 @@
 ## Установка
 
 1. Скачайте последний `plugin.video.movix-x.y.z.zip` из
-[релизов](https://github.com/vyachkonovalov/plugin.video.movix/releases)
+[релизов](https://github.com/crabvk/plugin.video.movix/releases)
 2. Откройте Kodi: Дополнения ⇒ Установить из файла ZIP
 
-## Кого чего
+## Что как
 
 ### Единственный слот устройства для нескольких установок плагина
 
-[Пока неготово](https://github.com/vyachkonovalov/plugin.video.movix/projects/1#card-36378995)
+[Пока неготово](https://github.com/crabvk/plugin.video.movix/projects/1#card-36378995)
 
 ### Разлогиниться
 

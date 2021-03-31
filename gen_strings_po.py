@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 import shutil
 import re
@@ -42,7 +42,6 @@ def key_to_id(key):
         raise Exception("No translation entry for key '%s' in en_gb.py" % key)
     idx, msgid = en[key]
     num = OFFSET + idx
-    msgid = msgid.decode('utf-8')
     po_entries['en_gb'][idx] = polib.POEntry(
         msgctxt='#%i' % num,
         msgid=msgid
@@ -54,7 +53,7 @@ def key_to_id(key):
         po_entries[lang][idx] = polib.POEntry(
             msgctxt='#%i' % num,
             msgid=msgid,
-            msgstr=msgstr.decode('utf-8')
+            msgstr=msgstr
         )
     return num
 

@@ -7,22 +7,20 @@ import xbmc
 import xbmcaddon
 import xbmcvfs
 import xbmcgui
-from functools import wraps
+from functools import wraps, reduce
 from resources.lib.translation import _
 
 addon = xbmcaddon.Addon()
 PLUGIN_VERSION = addon.getAddonInfo('version')
 LANG = xbmc.getLanguage(xbmc.ISO_639_1)
-STORAGE_PATH = xbmc.translatePath(addon.getAddonInfo('profile')).decode('utf-8')
+STORAGE_PATH = xbmcvfs.translatePath(addon.getAddonInfo('profile'))
 CACHE_PATH = os.path.join(STORAGE_PATH, 'cache/')
 if not xbmcvfs.exists(CACHE_PATH):
     xbmcvfs.mkdir(CACHE_PATH)
 
 
 def subset(data, *keys):
-    """
-    Gets subset of data with given keys
-    """
+    """Gets subset of data with given keys"""
     result = {}
     for key in keys:
         if type(key) in [list, tuple]:
@@ -136,4 +134,4 @@ def show_progress(message):
 
 def log(*args):
     msg = reduce(lambda a, b: str(a) + ' ' + str(b), args, '')
-    xbmc.log('===>' + msg, xbmc.LOGNOTICE)
+    xbmc.log('===>' + msg, xbmc.LOGINFO)
