@@ -17,7 +17,7 @@ DEVICE_ID = hashlib.sha1(str(uuid.getnode()).encode('utf8')).hexdigest()[-16:]
 HEADERS = {
     'X-Device-Info': DEVICE_ID,
     'View': 'stb3',
-    'X-App-Version': '3.9.5',
+    'X-App-Version': '3.12.0',
     'User-Agent': xbmc.getUserAgent()
 }
 
@@ -271,11 +271,9 @@ def _map_items(items, keys, res_map, limit=100, offset=0):
     mapped = []
     for item in items:
         offset += 1
-        if item['available']['type'] == 'not-available':
-            continue
         mi = utils.subset(item, *keys)
         resources = {r['type']: r for r in item['resources']}
-        res = {}
+        res = {'available': item['available']['type'] != 'not-available'}
         for data_key, res_type in res_map.items():
             if isinstance(res_type, str):
                 res[data_key] = resources.get(res_type, {}).get('id')

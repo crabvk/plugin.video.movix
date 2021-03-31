@@ -43,10 +43,13 @@ def index(router, _params=None):
         items.append((url, li, True))
 
         # Movies
-        free = utils.addon.getSettingBool('free_movies_only')
-        label = _('text.free_movies') if free else _('text.movies')
-        li = xbmcgui.ListItem(label=label)
+        li = xbmcgui.ListItem(label=_('text.movies'))
         url = router.movies_url('index')
+        items.append((url, li, True))
+
+        # Free movies
+        li = xbmcgui.ListItem(label=_('text.free_movies'))
+        url = router.movies_url('index_free')
         items.append((url, li, True))
 
         # Serials

@@ -26,7 +26,7 @@ en_gb = [
     ('progress.sms_request',         'Requesting SMS'),
     ('progress.status',              'Device status'),
     ('settings.channels_pagination', 'Channels pagination'),
-    ('settings.free_movies_only',    'Free movies only'),
+    ('settings.hide_not_available',  'Hide not available content'),
     ('settings.general',             'General'),
     ('settings.page_limit',          'Items per page'),
     ('text.channel_packages',        'Channel packages'),

@@ -26,7 +26,7 @@ ru_ru = [
     ('progress.sms_request',         'Запрос SMS'),
     ('progress.status',              'Статус устройства'),
     ('settings.channels_pagination', 'Разбить каналы по страницам'),
-    ('settings.free_movies_only',    'Только бесплатные фильмы'),
+    ('settings.hide_not_available',  'Скрыть недоступный контент'),
     ('settings.general',             'Общие'),
     ('settings.page_limit',          'Элементов на странице'),
     ('text.channel_packages',        'Пакеты каналов'),
