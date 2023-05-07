@@ -10,10 +10,17 @@ def index(router, params):
     handle = router.session.handle
     limit = utils.addon.getSettingInt('page_limit')
     offset = params.get('offset', 0)
+    hide_unavailable = utils.addon.getSettingBool('hide_unavailable')
 
-    resp = api.serials(router.session.token['token'], limit, offset)
+    if hide_unavailable:
+        resp = api.serials_available(router.session.token['token'], limit, offset)
+    else:
+        resp = api.serials(router.session.token['token'], limit, offset)
+
     serials = []
     for srl in resp['serials']:
+        if hide_unavailable and not srl['available']:
+            continue
         li = xbmcgui.ListItem(label=srl['title'], label2=srl['description'])
         li.setArt({'poster': api.art_url(srl['poster_id'])})
         if srl['fanart_id']:

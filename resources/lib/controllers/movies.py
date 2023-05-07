@@ -9,10 +9,13 @@ def index_page(router, params, free):
     handle = router.session.handle
     limit = utils.addon.getSettingInt('page_limit')
     offset = params.get('offset', 0)
+    hide_unavailable = not free and utils.addon.getSettingBool('hide_unavailable')
 
     resp = api.movies(router.session.token['token'], limit, offset, free)
     movies = []
     for mov in resp['movies']:
+        if hide_unavailable:
+            continue
         li = xbmcgui.ListItem(label=mov['title'], label2=mov['description'])
         li.setArt({'poster': api.art_url(mov['poster_id'])})
         if mov['fanart_id']:

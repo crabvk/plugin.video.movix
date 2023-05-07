@@ -1,3 +1,4 @@
+import math
 import types
 import os
 import time
@@ -123,7 +124,10 @@ def show_progress(message):
             dialog = xbmcgui.DialogProgressBG()
             dialog.create(_('header.loading'), message)
             try:
-                resp = func(*args)
+                if 'set_progress' in func.__code__.co_varnames:
+                    resp = func(*args, lambda percent: dialog.update(math.ceil(percent)))
+                else:
+                    resp = func(*args)
             finally:
                 dialog.close()
             return resp

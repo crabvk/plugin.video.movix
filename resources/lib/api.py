@@ -5,6 +5,7 @@ import hashlib
 import uuid
 import time
 from functools import wraps
+from itertools import chain
 from requests.exceptions import RequestException, ConnectionError, ConnectTimeout, ReadTimeout
 import resources.lib.utils as utils
 from resources.lib.utils import show_progress, cache
@@ -144,7 +145,7 @@ def channels(token, limit, page):
     url = STB_HOST + '/api/v3/showcases/library/channels'
     params = {'limit': str(limit), 'page': str(page)}
     resp = _request('get', url, params=params, headers=_headers(token))
-    chs, _ = _map_items(resp['data']['items'], ['id', 'title', 'description', 'lcn'], {
+    chs = _map_items(resp['data']['items'], ['id', 'title', 'description', 'lcn'], {
         'hls_id': 'hls',
         'poster_id': 'poster_channel_grid_blueprint'
     })
@@ -190,8 +191,8 @@ def channel_packages(token, limit, page):
     url = STB_HOST + '/api/v3/showcases/library/channel-packages'
     params = {'limit': str(limit), 'page': str(page)}
     resp = _request('get', url, params=params, headers=_headers(token))
-    pkgs, _ = _map_items(resp['data']['items'],
-                         ['id', 'title', 'description', (lambda i: i['adult']['type'], 'adult')], {
+    pkgs = _map_items(resp['data']['items'],
+                      ['id', 'title', 'description', (lambda i: i['adult']['type'], 'adult')], {
         'poster_id': '3_smarttv_package_poster_video_library_blueprint',
         'fanart_id': '3_smarttv_asset_background_banner_fullscreen_blueprint'
     })
@@ -204,7 +205,7 @@ def package_channels(token, id, adult=0):
     url = STB_HOST + '/api/v3/showcases/children/channel-package/%i/channels' % id
     params = {'adult': 'adult,not-adult'} if adult else None
     resp = _request('get', url, params=params, headers=_headers(token))
-    chs, _ = _map_items(resp['data']['items'], ['id', 'title', 'description', 'lcn'], {
+    chs = _map_items(resp['data']['items'], ['id', 'title', 'description', 'lcn'], {
         'hls_id': 'hls',
         'poster_id': 'poster_channel_grid_blueprint'
     })
@@ -215,28 +216,64 @@ def package_channels(token, id, adult=0):
 @show_progress(_('text.movies'))
 def movies(token, limit, offset, free):
     url = STB_HOST + '/api/v3/showcases/library/' + ('freemovies' if free else 'movies')
-    params = {'limit': '100', 'offset': str(offset)}
+    params = {'limit': str(limit), 'offset': str(offset)}
     resp = _request('get', url, params=params, headers=_headers(token))
-    movs, offset = _map_items(resp['data']['items'], ['id', 'title', 'description'], {
+    movs = _map_items(resp['data']['items'], ['id', 'title', 'description'], {
         'hls_id': 'hls',
         'poster_id': 'poster_blueprint',
         'fanart_id': '3_smarttv_asset_background_video_library_blueprint'
-    }, limit, offset)
-    return {'movies': movs, 'offset': offset, 'total': resp['data']['total']}
+    })
+    return {'movies': movs, 'offset': offset + limit, 'total': resp['data']['total']}
 
 
 @cache(CACHE_MAX_AGE)
 @show_progress(_('text.serials'))
 def serials(token, limit, offset):
-    params = {'limit': '100', 'offset': str(offset)}
+    params = {'limit': str(limit), 'offset': str(offset)}
     url = STB_HOST + '/api/v3/showcases/library/serials'
     resp = _request('get', url, params=params, headers=_headers(token))
-    srls, offset = _map_items(resp['data']['items'], ['id', 'title', 'description'], {
+    srls = _map_items(resp['data']['items'], ['id', 'title', 'description'], {
         'hls_id': 'hls',
         'poster_id': 'poster_blueprint',
         'fanart_id': '3_smarttv_serial_background_video_library_blueprint'
-    }, limit, offset)
-    return {'serials': srls, 'offset': offset, 'total': resp['data']['total']}
+    })
+    return {'serials': srls, 'offset': offset + limit, 'total': resp['data']['total']}
+
+
+def _filter_available(items):
+    length = len(items)
+    fl = filter(lambda i: i['available']['type'] != 'not-available', items)
+    return length, fl
+
+
+@cache(86400)  # 1 day
+@show_progress(_('text.available_serials'))
+def serials_available(token, limit, offset, set_progress):
+    params = {'limit': '100', 'offset': str(offset)}
+    url = STB_HOST + '/api/v3/showcases/library/serials'
+    headers = _headers(token)
+    resp = _request('get', url, params=params, headers=headers)
+    items_total = resp['data']['total']
+
+    length, filtered = _filter_available(resp['data']['items'])
+    items = list(filtered)
+    set_progress(len(items) / limit * 100)
+    offset += length
+
+    while len(items) < limit and offset < items_total:
+        params.update({'offset': str(offset)})
+        resp = _request('get', url, params=params, headers=headers)
+        length, filtered = _filter_available(resp['data']['items'])
+        items = list(chain(items, filtered))
+        set_progress(len(items) / limit * 100)
+        offset += length
+
+    srls = _map_items(items, ['id', 'title', 'description'], {
+        'hls_id': 'hls',
+        'poster_id': 'poster_blueprint',
+        'fanart_id': '3_smarttv_serial_background_video_library_blueprint'
+    })
+    return {'serials': srls, 'offset': offset, 'total': items_total}
 
 
 @cache(CACHE_MAX_AGE)
@@ -244,7 +281,7 @@ def serials(token, limit, offset):
 def seasons(token, serial_id):
     url = STB_HOST + '/api/v3/showcases/seasons/serial/%i/seasons' % serial_id
     resp = _request('get', url, headers=_headers(token))
-    sns, _ = _map_items(resp['data']['items'], ['id', 'title', 'description', 'number'], {
+    sns = _map_items(resp['data']['items'], ['id', 'title', 'description', 'number'], {
         'poster_id': 'poster_blueprint',
         'fanart_id': '3_smarttv_season_background_video_library_blueprint'
     })
@@ -256,7 +293,7 @@ def seasons(token, serial_id):
 def episodes(token, season_id):
     url = STB_HOST + '/api/v3/showcases/episodes/season/%i/episodes' % season_id
     resp = _request('get', url, headers=_headers(token))
-    epds, _ = _map_items(resp['data']['items'], ['id', 'title', 'description', 'number'], {
+    epds = _map_items(resp['data']['items'], ['id', 'title', 'description', 'number'], {
         'hls_id': 'hls',
         'poster_id': [
             '3_smarttv_episode_poster_video_library_blueprint',
@@ -267,10 +304,9 @@ def episodes(token, season_id):
     return {'episodes': epds}
 
 
-def _map_items(items, keys, res_map, limit=100, offset=0):
+def _map_items(items, keys, res_map):
     mapped = []
     for item in items:
-        offset += 1
         mi = utils.subset(item, *keys)
         resources = {r['type']: r for r in item['resources']}
         res = {'available': item['available']['type'] != 'not-available'}
@@ -281,9 +317,7 @@ def _map_items(items, keys, res_map, limit=100, offset=0):
                 res[data_key] = next((resources[t]['id'] for t in res_type if resources.get(t)), None)
         mi.update(res)
         mapped.append(mi)
-        if len(mapped) == limit:
-            break
-    return [mapped, offset]
+    return mapped
 
 
 def _request(method, url, **kwargs):
